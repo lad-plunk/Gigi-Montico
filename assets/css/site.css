@@ -55,8 +55,10 @@ nav a {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   border-bottom: 1px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
 }
 nav a.active { border-bottom-color: var(--accent); }
+nav a:hover { color: var(--accent); border-bottom-color: color-mix(in srgb, var(--accent) 45%, white 55%); }
 
 .lang-switch {
   display: inline-flex;
@@ -109,6 +111,21 @@ main { width: min(1160px, 92vw); margin: 0 auto; }
   padding: 0.75rem 1.2rem;
   border-radius: 999px;
   font-size: 0.9rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(30, 20, 14, 0.18);
+  background: #7f1717;
+}
+.btn.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.btn.btn-secondary:hover {
+  background: #f5eee2;
+  box-shadow: 0 10px 20px rgba(30, 20, 14, 0.12);
 }
 .hero-art img {
   width: 100%;
@@ -149,6 +166,70 @@ blockquote {
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(20, 14, 10, 0.12);
+}
+.card a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 700;
+}
+.card a:hover { text-decoration: underline; }
+
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+.kpi {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  background: #f8f3e7;
+}
+.kpi .kpi-value {
+  font-family: "Bodoni MT", Didot, "Times New Roman", serif;
+  font-size: 1.55rem;
+  color: var(--accent);
+  margin: 0;
+}
+.kpi .kpi-label {
+  margin: 0.2rem 0 0;
+  color: #3d362d;
+  font-size: 0.9rem;
+}
+
+.pill-list {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin: 0.75rem 0 0;
+}
+.pill {
+  display: inline-block;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+  background: #f6f0e3;
+  color: #433c33;
+}
+
+.cta-panel {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: color-mix(in srgb, #f7efe2 76%, #fff 24%);
+  padding: 1.1rem 1.2rem;
+}
+.cta-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
 .gallery { column-count: 4; column-gap: 0.8rem; }
@@ -285,6 +366,7 @@ blockquote {
   .hero { grid-template-columns: 1fr; padding-top: 2rem; }
   .cards { grid-template-columns: 1fr; }
   .grid-2 { grid-template-columns: 1fr; }
+  .kpi-strip { grid-template-columns: 1fr; }
   .gallery { column-count: 2; }
 }
 @media (max-width: 520px) { .gallery { column-count: 1; } }

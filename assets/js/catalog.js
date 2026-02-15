@@ -42,6 +42,10 @@
   const bookOrder = ['LS', 'DA', 'AS', 'CP'];
   const normalize = (v) => (v || '').toLowerCase();
   const safePath = (p) => encodeURI('../' + p.replace(/\\/g, '/'));
+  const mediaVersion = () => {
+    const stamp = (window.ARCHIVE_CATALOG && window.ARCHIVE_CATALOG.generatedAt) || '';
+    return stamp ? ('?v=' + encodeURIComponent(stamp)) : '';
+  };
 
   function card(item) {
     const title = item.title || t.noTitle;
@@ -49,14 +53,14 @@
     return `
       <article class="archive-card">
         <div class="archive-media">
-          <img loading="lazy" src="${safePath(item.path)}" alt="${title}" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=&quot;no-preview&quot;>${t.noPreview}</div>';">
+          <img loading="lazy" src="${safePath(item.path)}${mediaVersion()}" alt="${title}" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=&quot;no-preview&quot;>${t.noPreview}</div>';">
         </div>
         <div class="archive-meta">
           <p><strong>${t.id}:</strong> ${item.id}</p>
           <p><strong>${t.title}:</strong> ${title}</p>
           ${item.dimensionsCm ? `<p><strong>${t.dimensions}:</strong> ${item.dimensionsCm}</p>` : ''}
           <p><strong>${t.source}:</strong> ${sourceName} (${item.bookCode})</p>
-          <p><a href="${safePath(item.path)}" target="_blank" rel="noopener">${t.open}</a></p>
+          <p><a href="${safePath(item.path)}${mediaVersion()}" target="_blank" rel="noopener">${t.open}</a></p>
         </div>
       </article>
     `;
@@ -80,13 +84,21 @@
     let html = '';
     for (const code of grouped.keys()) {
       const group = grouped.get(code);
-      if (!group.length) continue;
-      const name = lang === 'it' ? group[0].bookTitleIt : group[0].bookTitleEn;
+      const first = group[0] || null;
+      const name = first
+        ? (lang === 'it' ? first.bookTitleIt : first.bookTitleEn)
+        : code;
+      let cards = '';
+      try {
+        cards = group.map(card).join('');
+      } catch (_) {
+        cards = `<p class="lead">${lang === 'it' ? 'Errore nella visualizzazione delle opere.' : 'Rendering error for works.'}</p>`;
+      }
       html += `
-        <section class="section reveal">
+        <section class="section is-visible">
           <h3>${name}</h3>
           <p class="lead">${group.length} ${t.count}</p>
-          <div class="archive-grid">${group.map(card).join('')}</div>
+          <div class="archive-grid">${cards}</div>
         </section>
       `;
     }
@@ -95,7 +107,7 @@
 
   function renderSingleExhibition(title, subtitle, items) {
     mount.innerHTML = `
-      <section class="section reveal">
+      <section class="section is-visible">
         <h3>${title}</h3>
         ${subtitle ? `<p class="lead">${subtitle}</p>` : ''}
         <div class="archive-grid">${items.map(card).join('')}</div>
@@ -124,28 +136,15 @@
         renderSingleExhibition(t.ex3, t.ex3Sub, ai);
       } else if (mode === 'exhibitions') {
         mount.innerHTML = `
-          <section class="section reveal"><h3>${t.ex1}</h3><div class="archive-grid">${realismo.map(card).join('')}</div></section>
-          <section class="section reveal"><h3>${t.ex2}</h3><div class="archive-grid">${sostenibile.map(card).join('')}</div></section>
-          <section class="section reveal"><h3>${t.ex3}</h3><p class="lead">${t.ex3Sub}</p><div class="archive-grid">${ai.map(card).join('')}</div></section>
+          <section class="section is-visible"><h3>${t.ex1}</h3><div class="archive-grid">${realismo.map(card).join('')}</div></section>
+          <section class="section is-visible"><h3>${t.ex2}</h3><div class="archive-grid">${sostenibile.map(card).join('')}</div></section>
+          <section class="section is-visible"><h3>${t.ex3}</h3><p class="lead">${t.ex3Sub}</p><div class="archive-grid">${ai.map(card).join('')}</div></section>
         `;
       } else {
         renderGroupedArchive(all);
       }
 
       window.dispatchEvent(new Event('catalog:rendered'));
-
-      if (window.IntersectionObserver) {
-        const sections = document.querySelectorAll('.reveal');
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-visible');
-              observer.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.12 });
-        sections.forEach((s) => observer.observe(s));
-      }
     })
     .catch(() => {
       mount.innerHTML = '<p>Catalog loading error.</p>';
