@@ -1,0 +1,153 @@
+﻿(function () {
+  const root = document.querySelector('[data-catalog-mode]');
+  if (!root) return;
+
+  const mode = root.dataset.catalogMode;
+  const lang = root.dataset.lang || 'it';
+  const mount = document.getElementById('catalog-root');
+  if (!mount) return;
+
+  const labels = {
+    it: {
+      id: 'ID',
+      title: 'Titolo',
+      dimensions: 'Dimensioni',
+      source: 'Fonte',
+      noTitle: 'Titolo non disponibile',
+      noPreview: 'Anteprima non disponibile',
+      open: 'Apri file',
+      count: 'opere',
+      ex1: 'Mostra virtuale: Realismo Terminale e paesaggio critico',
+      ex2: 'Mostra virtuale: Arte sostenibile e materia di recupero',
+      ex3: 'Mostra virtuale: Arte digitale con supporto IA',
+      ex3Sub: 'Immagini provenienti dalla cartella "AI generated photos".'
+    },
+    en: {
+      id: 'ID',
+      title: 'Title',
+      dimensions: 'Dimensions',
+      source: 'Source',
+      noTitle: 'Title not available',
+      noPreview: 'Preview not available',
+      open: 'Open file',
+      count: 'works',
+      ex1: 'Virtual exhibition: Terminal Realism and critical landscape',
+      ex2: 'Virtual exhibition: Sustainable art and recovered matter',
+      ex3: 'Virtual exhibition: Digital art with AI support',
+      ex3Sub: 'Images sourced from the "AI generated photos" folder.'
+    }
+  };
+
+  const t = labels[lang] || labels.it;
+  const bookOrder = ['LS', 'DA', 'AS', 'CP'];
+  const normalize = (v) => (v || '').toLowerCase();
+  const safePath = (p) => encodeURI('../' + p.replace(/\\/g, '/'));
+
+  function card(item) {
+    const title = item.title || t.noTitle;
+    const sourceName = lang === 'it' ? (item.bookTitleIt || item.bookCode) : (item.bookTitleEn || item.bookCode);
+    return `
+      <article class="archive-card">
+        <div class="archive-media">
+          <img loading="lazy" src="${safePath(item.path)}" alt="${title}" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=&quot;no-preview&quot;>${t.noPreview}</div>';">
+        </div>
+        <div class="archive-meta">
+          <p><strong>${t.id}:</strong> ${item.id}</p>
+          <p><strong>${t.title}:</strong> ${title}</p>
+          ${item.dimensionsCm ? `<p><strong>${t.dimensions}:</strong> ${item.dimensionsCm}</p>` : ''}
+          <p><strong>${t.source}:</strong> ${sourceName} (${item.bookCode})</p>
+          <p><a href="${safePath(item.path)}" target="_blank" rel="noopener">${t.open}</a></p>
+        </div>
+      </article>
+    `;
+  }
+
+  function byKeyword(items, words) {
+    return items.filter((item) => {
+      const v = normalize(item.title);
+      return words.some((w) => v.includes(w));
+    });
+  }
+
+  function renderGroupedArchive(items) {
+    const grouped = new Map();
+    bookOrder.forEach((k) => grouped.set(k, []));
+    items.forEach((item) => {
+      if (!grouped.has(item.bookCode)) grouped.set(item.bookCode, []);
+      grouped.get(item.bookCode).push(item);
+    });
+
+    let html = '';
+    for (const code of grouped.keys()) {
+      const group = grouped.get(code);
+      if (!group.length) continue;
+      const name = lang === 'it' ? group[0].bookTitleIt : group[0].bookTitleEn;
+      html += `
+        <section class="section reveal">
+          <h3>${name}</h3>
+          <p class="lead">${group.length} ${t.count}</p>
+          <div class="archive-grid">${group.map(card).join('')}</div>
+        </section>
+      `;
+    }
+    mount.innerHTML = html;
+  }
+
+  function renderSingleExhibition(title, subtitle, items) {
+    mount.innerHTML = `
+      <section class="section reveal">
+        <h3>${title}</h3>
+        ${subtitle ? `<p class="lead">${subtitle}</p>` : ''}
+        <div class="archive-grid">${items.map(card).join('')}</div>
+      </section>
+    `;
+  }
+
+  Promise.resolve(window.ARCHIVE_CATALOG || null)
+    .then((data) => {
+      if (!data) throw new Error('Catalog missing');
+      const all = (data.items || []).filter((x) => x.hasPreview && x.extension !== '.heic');
+
+      const realismo = byKeyword(all, ['fabbriche', 'centrale', 'discarica', 'mosche', 'mosul', 'paure', 'deserto', 'viaggio', 'santorini']);
+      const sostenibile = all.filter((x) => x.bookCode === 'LS');
+      const ai = all
+        .filter((x) => x.bookCode === 'DA')
+        .sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+
+      if (mode === 'archive') {
+        renderGroupedArchive(all);
+      } else if (mode === 'exhibition-realismo') {
+        renderSingleExhibition(t.ex1, '', realismo);
+      } else if (mode === 'exhibition-sostenibile') {
+        renderSingleExhibition(t.ex2, '', sostenibile);
+      } else if (mode === 'exhibition-ai') {
+        renderSingleExhibition(t.ex3, t.ex3Sub, ai);
+      } else if (mode === 'exhibitions') {
+        mount.innerHTML = `
+          <section class="section reveal"><h3>${t.ex1}</h3><div class="archive-grid">${realismo.map(card).join('')}</div></section>
+          <section class="section reveal"><h3>${t.ex2}</h3><div class="archive-grid">${sostenibile.map(card).join('')}</div></section>
+          <section class="section reveal"><h3>${t.ex3}</h3><p class="lead">${t.ex3Sub}</p><div class="archive-grid">${ai.map(card).join('')}</div></section>
+        `;
+      } else {
+        renderGroupedArchive(all);
+      }
+
+      window.dispatchEvent(new Event('catalog:rendered'));
+
+      if (window.IntersectionObserver) {
+        const sections = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+        sections.forEach((s) => observer.observe(s));
+      }
+    })
+    .catch(() => {
+      mount.innerHTML = '<p>Catalog loading error.</p>';
+    });
+})();

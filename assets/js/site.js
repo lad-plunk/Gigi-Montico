@@ -27,14 +27,21 @@
     lightboxImg.removeAttribute('src');
   }
 
-  document.querySelectorAll('img.zoomable, .gallery img').forEach((img) => {
-    img.classList.add('zoomable');
-    img.addEventListener('click', () => {
-      lightboxImg.src = img.src;
-      lightboxImg.alt = img.alt || 'Artwork image';
-      lightbox.classList.add('open');
+  function bindZoomables() {
+    document.querySelectorAll('img.zoomable, .gallery img, .archive-media img').forEach((img) => {
+      if (img.dataset.zoomBound === '1') return;
+      img.dataset.zoomBound = '1';
+      img.classList.add('zoomable');
+      img.addEventListener('click', () => {
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt || 'Artwork image';
+        lightbox.classList.add('open');
+      });
     });
-  });
+  }
+
+  bindZoomables();
+  window.addEventListener('catalog:rendered', bindZoomables);
 
   closeBtn.addEventListener('click', closeLightbox);
   lightbox.addEventListener('click', (e) => {

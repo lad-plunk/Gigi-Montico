@@ -119,6 +119,13 @@ main { width: min(1160px, 92vw); margin: 0 auto; }
   box-shadow: 0 18px 50px rgba(22, 16, 12, 0.22);
 }
 
+.hero-art img.no-crop {
+  object-fit: contain;
+  max-height: none;
+  height: auto;
+  background: #f8f4ea;
+}
+
 .section { padding: 2.2rem 0; border-top: 1px solid var(--line); }
 h2 {
   font-family: "Bodoni MT", Didot, "Times New Roman", serif;
@@ -176,6 +183,37 @@ blockquote {
   border-top: 1px solid var(--line);
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.footer-socials {
+  margin-top: 0.6rem;
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--ink);
+  background: #fff;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.social-link:hover {
+  transform: translateY(-1px);
+  background: #f4ece0;
+}
+
+.social-link svg {
+  width: 1rem;
+  height: 1rem;
 }
 
 .language-home {
@@ -250,3 +288,40 @@ blockquote {
   .gallery { column-count: 2; }
 }
 @media (max-width: 520px) { .gallery { column-count: 1; } }
+
+.archive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 0.9rem;
+}
+.archive-card {
+  border: 1px solid var(--line);
+  background: #f8f4ea;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.archive-media {
+  aspect-ratio: 4 / 3;
+  background: #efe7d8;
+  display: grid;
+  place-items: center;
+}
+.archive-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: zoom-in;
+}
+.archive-meta {
+  padding: 0.6rem 0.7rem;
+  font-size: 0.85rem;
+}
+.archive-meta p {
+  margin: 0.2rem 0;
+}
+.no-preview {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 0.8rem;
+}
