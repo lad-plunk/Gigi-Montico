@@ -62,19 +62,23 @@
   setupMobileNav();
 
   const sections = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.14 });
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.01 });
 
-  sections.forEach((section, idx) => {
-    section.style.transitionDelay = `${Math.min(idx * 70, 320)}ms`;
-    observer.observe(section);
-  });
+    sections.forEach((section, idx) => {
+      section.style.transitionDelay = `${Math.min(idx * 70, 320)}ms`;
+      observer.observe(section);
+    });
+  } else {
+    sections.forEach((section) => section.classList.add('is-visible'));
+  }
 
   const lightbox = document.createElement('div');
   lightbox.className = 'lightbox';
