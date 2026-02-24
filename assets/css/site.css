@@ -10,6 +10,7 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
+img { max-width: 100%; height: auto; }
 body {
   font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
   color: var(--ink);
@@ -80,6 +81,19 @@ nav a:hover { color: var(--accent); border-bottom-color: color-mix(in srgb, var(
   color: #fff;
 }
 
+.mobile-nav-toggle {
+  display: none;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
 main { width: min(1160px, 92vw); margin: 0 auto; }
 
 .hero {
@@ -144,7 +158,7 @@ main { width: min(1160px, 92vw); margin: 0 auto; }
 }
 
 .section { padding: 2.2rem 0; border-top: 1px solid var(--line); }
-h2 {
+h1, h2 {
   font-family: "Bodoni MT", Didot, "Times New Roman", serif;
   font-size: clamp(1.6rem, 2.4vw, 2.5rem);
   margin-top: 0;
@@ -362,14 +376,56 @@ blockquote {
 
 @media (max-width: 1040px) { .gallery { column-count: 3; } }
 @media (max-width: 860px) {
-  .site-header { flex-direction: column; gap: 0.7rem; }
   .hero { grid-template-columns: 1fr; padding-top: 2rem; }
   .cards { grid-template-columns: 1fr; }
   .grid-2 { grid-template-columns: 1fr; }
   .kpi-strip { grid-template-columns: 1fr; }
   .gallery { column-count: 2; }
 }
-@media (max-width: 520px) { .gallery { column-count: 1; } }
+@media (max-width: 520px) {
+  .gallery { column-count: 1; }
+  .cta-actions { flex-direction: column; align-items: stretch; }
+  .btn { width: 100%; text-align: center; }
+}
+
+@media (max-width: 920px) {
+  .site-header {
+    flex-wrap: wrap;
+    gap: 0.45rem 0.7rem;
+    align-items: center;
+  }
+
+  .mobile-nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+  }
+
+  .js .site-header nav {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    padding-top: 0.45rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .js .site-header.nav-open nav { display: flex; }
+
+  .js .site-header nav > a {
+    display: block;
+    width: 100%;
+    padding: 0.26rem 0;
+    font-size: 0.82rem;
+  }
+
+  .js .site-header nav .lang-switch {
+    margin-left: 0;
+    margin-top: 0.25rem;
+  }
+}
 
 .archive-grid {
   display: grid;

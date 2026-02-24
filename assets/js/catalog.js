@@ -9,32 +9,32 @@
 
   const labels = {
     it: {
-      id: 'ID',
+      id: 'Codice opera',
       title: 'Titolo',
       dimensions: 'Dimensioni',
       source: 'Fonte',
       noTitle: 'Titolo non disponibile',
       noPreview: 'Anteprima non disponibile',
-      open: 'Apri file',
+      open: 'Apri immagine',
       count: 'opere',
       ex1: 'Mostra virtuale: Realismo Terminale e paesaggio critico',
       ex2: 'Mostra virtuale: Arte sostenibile e materia di recupero',
       ex3: 'Mostra virtuale: Arte digitale con supporto IA',
-      ex3Sub: 'Immagini provenienti dalla cartella "AI generated photos".'
+      ex3Sub: 'Una selezione di opere digitali nate dal dialogo tra pittura e strumenti di IA.'
     },
     en: {
-      id: 'ID',
+      id: 'Work code',
       title: 'Title',
       dimensions: 'Dimensions',
       source: 'Source',
       noTitle: 'Title not available',
       noPreview: 'Preview not available',
-      open: 'Open file',
+      open: 'Open image',
       count: 'works',
       ex1: 'Virtual exhibition: Terminal Realism and critical landscape',
       ex2: 'Virtual exhibition: Sustainable art and recovered matter',
       ex3: 'Virtual exhibition: Digital art with AI support',
-      ex3Sub: 'Images sourced from the "AI generated photos" folder.'
+      ex3Sub: 'A selection of digital works shaped by the dialogue between painting and AI tools.'
     }
   };
 
