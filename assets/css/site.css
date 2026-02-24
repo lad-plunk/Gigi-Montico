@@ -175,6 +175,7 @@ blockquote {
 
 .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
 .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.pdf-library-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .card {
   background: var(--card);
   border: 1px solid var(--line);
