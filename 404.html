@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gigi Montico | Link non trovato</title>
+  <meta name="robots" content="noindex,follow">
+  <meta name="theme-color" content="#9b1f1f">
+  <link rel="stylesheet" href="/Gigi-Montico/assets/css/site.css">
+  <script>
+    (function () {
+      const repoName = 'Gigi-Montico';
+      const url = new URL(window.location.href);
+      const parts = url.pathname.split('/');
+      let changed = false;
+
+      for (let i = 0; i < parts.length; i += 1) {
+        if (parts[i].toLowerCase() === repoName.toLowerCase() && parts[i] !== repoName) {
+          parts[i] = repoName;
+          changed = true;
+        }
+      }
+
+      if (!changed) return;
+
+      url.pathname = parts.join('/');
+      window.location.replace(url.toString());
+    })();
+  </script>
+</head>
+<body>
+  <div class="bg-orb bg-orb-a" aria-hidden="true"></div>
+  <div class="bg-orb bg-orb-b" aria-hidden="true"></div>
+  <main class="language-home">
+    <section class="language-panel">
+      <h1>Link non trovato</h1>
+      <p>Se il link arriva da Facebook o da una condivisione copiaincollata, il sito prova prima a correggere automaticamente il percorso.</p>
+      <p>Se resti su questa pagina, usa uno dei link ufficiali qui sotto.</p>
+      <p><a href="/Gigi-Montico/it/">Apri il sito in italiano</a></p>
+      <p><a href="/Gigi-Montico/en/">Open the English site</a></p>
+    </section>
+  </main>
+</body>
+</html>

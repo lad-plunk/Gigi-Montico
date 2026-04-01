@@ -1,4 +1,40 @@
 (() => {
+  function stripTrackingParams() {
+    if (!window.history || typeof window.history.replaceState !== 'function') return;
+
+    const url = new URL(window.location.href);
+    const trackedKeys = new Set([
+      'fbclid',
+      'gclid',
+      'dclid',
+      'gbraid',
+      'wbraid',
+      'mc_cid',
+      'mc_eid',
+      'igshid',
+      'mibextid',
+      '__tn__'
+    ]);
+    const trackedPrefixes = ['utm_', '__cft__'];
+    let changed = false;
+
+    Array.from(url.searchParams.keys()).forEach((key) => {
+      const shouldDelete = trackedKeys.has(key)
+        || trackedPrefixes.some((prefix) => key.startsWith(prefix));
+      if (!shouldDelete) return;
+      url.searchParams.delete(key);
+      changed = true;
+    });
+
+    if (!changed) return;
+
+    const cleanSearch = url.searchParams.toString();
+    const cleanUrl = `${url.pathname}${cleanSearch ? `?${cleanSearch}` : ''}${url.hash}`;
+    window.history.replaceState(window.history.state, document.title, cleanUrl);
+  }
+
+  stripTrackingParams();
+
   document.documentElement.classList.add('js');
 
   function setupMobileNav() {
