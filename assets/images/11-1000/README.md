@@ -1,6 +1,6 @@
 # 11 / 1000 web images
 
-This folder contains website-only derivatives for the Italian `11 / 1000` project page.
+This folder contains website-only derivatives shared by the Italian and English `11 / 1000` project pages.
 
 - `M1000-*.webp`: faithful, uncropped WebP derivatives of the 11 exact canonical files recognized by Gigi Montico.
 - `book-cover.webp`: optimized website cover thumbnail retained from the earlier RC7 rendering.

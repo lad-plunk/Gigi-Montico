@@ -44,10 +44,11 @@ Every project folder has its own `README.md` with local ownership and maintenanc
 - `en/reviews.html` ↔ `it/recensioni.html`
 - `en/sustainability.html` ↔ `it/sostenibilita.html`
 - `en/montico-house.html` ↔ `it/casa-montico.html`
+- `en/11-1000.html` ↔ `it/11-1000.html`
 
 When changing content or navigation, update both language counterparts and their metadata: title, description, canonical URL, `hreflang`, Open Graph, Twitter card, structured data, navigation state, and language switch.
 
-Approved staged-release exception: `it/11-1000.html` is currently Italian-only pending owner validation. Its EN language control intentionally routes to `en/index.html`; it does not declare a false English `hreflang` equivalent.
+The `11 / 1000` project is published in both languages. Both localized project pages link to the same authoritative completed Italian RC10 PDF until a finalized English book edition is explicitly approved.
 
 ## Catalog data flows
 
@@ -82,5 +83,5 @@ The photo archive declares 326 source photographs. Grid previews are lightweight
 - `archive.json` parses and agrees with `archive.js` on catalog content.
 - Catalog item count equals `total`, IDs are unique, and every item media path exists.
 - `paintings-archive.json` agrees with its JS mirror, declares 326 unique IDs and source hashes, and every preview/full path and byte size matches the generated file.
-- Each established bilingual page has its intended counterpart; approved staged-release exceptions are documented above.
+- Each established bilingual page has its intended counterpart.
 - `sitemap.xml` contains all public HTML pages and no removed pages.
