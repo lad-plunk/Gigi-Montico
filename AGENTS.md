@@ -12,7 +12,7 @@ Maintain a polished bilingual static portfolio and archive for Gigi Montico. The
 - `assets/js/catalog.js` owns data-driven archive and exhibition rendering.
 - Pages load `assets/data/archive.js`, which assigns `window.ARCHIVE_CATALOG`.
 - `assets/data/archive.json` is the machine-readable catalog mirror.
-- GitHub Pages serves paths relative to `/Gigi-Montico/`; preserve relative links inside HTML.
+- GitHub Pages publishes from the repository root at `https://artemontico.it/`; preserve relative links inside HTML and keep `CNAME`, canonical URLs, social metadata, `robots.txt`, and `sitemap.xml` aligned with the custom domain.
 
 ## Change rules
 

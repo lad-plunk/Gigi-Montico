@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://lad-plunk.github.io/Gigi-Montico/sitemap.xml
+Sitemap: https://artemontico.it/sitemap.xml

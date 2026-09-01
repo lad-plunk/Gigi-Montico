@@ -319,7 +319,7 @@ blockquote {
   padding: 2rem;
 }
 .language-panel {
-  width: min(560px, 96vw);
+  width: min(560px, calc(100vw - 4rem));
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 22px;

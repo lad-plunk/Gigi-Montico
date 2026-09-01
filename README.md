@@ -1,16 +1,17 @@
 # Gigi Montico website
 
-This repository contains the bilingual Italian/English static website for artist Pierluigi Monticone (Gigi Montico). It is designed for direct hosting on GitHub Pages and has no build step, package manager, or server-side component.
+This repository contains the bilingual Italian/English static website for artist Pierluigi Monticone (Gigi Montico). It is published by GitHub Pages at `https://artemontico.it/` and has no build step, package manager, or server-side component.
 
 ## Start here
 
 - `index.html` is the root language entry point.
+- `CNAME` binds the GitHub Pages deployment to `artemontico.it`.
 - `it/` and `en/` contain the Italian and English pages.
 - `assets/css/site.css` contains the shared visual system and responsive layout.
 - `assets/js/site.js` contains shared navigation, reveal, tracking-parameter cleanup, and lightbox behavior.
 - `assets/data/archive.js` is the browser-loaded artwork catalog; `assets/data/archive.json` is its machine-readable equivalent.
 - `assets/js/catalog.js` renders archive and exhibition cards from the catalog.
-- `sitemap.xml`, `robots.txt`, `404.html`, and the Google verification file support deployment and search indexing.
+- `sitemap.xml`, `robots.txt`, `404.html`, and the Google verification file support custom-domain deployment and search indexing.
 - `mobile-audit-report.json` is retained QA evidence, not runtime site data.
 
 ## Repository map
