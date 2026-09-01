@@ -590,18 +590,43 @@ blockquote {
   grid-column: span 2;
 }
 .project-art-button {
+  position: relative;
   display: block;
   width: 100%;
   margin: 0;
   padding: 0;
   border: 0;
-  background: #e9e1d2;
+  aspect-ratio: 1209 / 1665;
+  overflow: hidden;
+  background: #17110b;
   cursor: zoom-in;
 }
 .project-art-button img {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
   display: block;
-  width: 100%;
+  width: 75%;
   height: auto;
+  transform: translate(-50%, -50%);
+}
+.project-art-button::after {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background: url("../images/11-1000/gold-frame-portrait.png") center / 100% 100% no-repeat;
+  content: "";
+  pointer-events: none;
+}
+.project-art-card-wide .project-art-button {
+  aspect-ratio: 1609 / 1195;
+}
+.project-art-card-wide .project-art-button img {
+  width: 81.47%;
+}
+.project-art-card-wide .project-art-button::after {
+  background-image: url("../images/11-1000/gold-frame-landscape.png");
 }
 .project-art-button:focus-visible,
 .project-lightbox button:focus-visible {

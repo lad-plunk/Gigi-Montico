@@ -1,7 +1,8 @@
 # Publications
 
-This folder contains four downloadable PDF books referenced from the Italian `libri.html` and English `books.html` pages:
+This folder contains five downloadable PDF books referenced from the Italian `libri.html` and English `books.html` pages:
 
+- `11-1000-arte-metodo-autorialita-it.pdf`: completed Italian RC9 edition of *11 / 1000*.
 - `arte-sostenibilita-it-20230402.pdf`
 - `arte-sostenibilita-v3-2023.pdf`
 - `collezione-privata-2021.pdf`
