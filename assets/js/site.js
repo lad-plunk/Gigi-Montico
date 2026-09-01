@@ -118,27 +118,51 @@
 
   const lightbox = document.createElement('div');
   lightbox.className = 'lightbox';
-  lightbox.innerHTML = '<button type="button" aria-label="Close">x</button><img alt="Zoomed artwork">';
+  const isItalian = (document.documentElement.lang || '').toLowerCase().startsWith('it');
+  lightbox.setAttribute('role', 'dialog');
+  lightbox.setAttribute('aria-modal', 'true');
+  lightbox.setAttribute('aria-label', isItalian ? 'Immagine ingrandita' : 'Enlarged image');
+  lightbox.innerHTML = `<button type="button" aria-label="${isItalian ? 'Chiudi' : 'Close'}">×</button><img alt="">`;
   document.body.appendChild(lightbox);
 
   const closeBtn = lightbox.querySelector('button');
   const lightboxImg = lightbox.querySelector('img');
+  let returnFocus = null;
 
   function closeLightbox() {
     lightbox.classList.remove('open');
     lightboxImg.removeAttribute('src');
+    document.body.classList.remove('lightbox-open');
+    if (returnFocus) returnFocus.focus();
+    returnFocus = null;
+  }
+
+  function openLightbox(img, trigger) {
+    returnFocus = trigger;
+    lightboxImg.src = img.dataset.full || img.src;
+    lightboxImg.alt = img.alt || (isItalian ? 'Opera ingrandita' : 'Enlarged artwork');
+    lightbox.classList.add('open');
+    document.body.classList.add('lightbox-open');
+    closeBtn.focus();
   }
 
   function bindZoomables() {
-    document.querySelectorAll('img.zoomable, .gallery img, .archive-media img').forEach((img) => {
-      if (img.dataset.zoomBound === '1') return;
-      img.dataset.zoomBound = '1';
+    document.querySelectorAll('img.zoomable, .gallery img, .archive-media img, .paintings-archive img').forEach((img) => {
+      const trigger = img.closest('.paintings-archive-button') || img;
+      if (trigger.dataset.zoomBound === '1') return;
+      trigger.dataset.zoomBound = '1';
       img.classList.add('zoomable');
-      img.addEventListener('click', () => {
-        lightboxImg.src = img.src;
-        lightboxImg.alt = img.alt || 'Artwork image';
-        lightbox.classList.add('open');
-      });
+      if (trigger === img) {
+        trigger.tabIndex = 0;
+        trigger.setAttribute('role', 'button');
+        trigger.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openLightbox(img, trigger);
+          }
+        });
+      }
+      trigger.addEventListener('click', () => openLightbox(img, trigger));
     });
   }
 

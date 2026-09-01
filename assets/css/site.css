@@ -465,6 +465,64 @@ blockquote {
   padding: 0.8rem;
 }
 
+/* Photo-only paintings archive */
+.paintings-archive-status {
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.paintings-archive {
+  column-count: 5;
+  column-gap: 0.8rem;
+}
+.paintings-archive-item {
+  margin: 0 0 0.8rem;
+  break-inside: avoid;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #efe7d8;
+}
+.paintings-archive-button {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+.paintings-archive-button img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+.paintings-archive-button:hover img {
+  transform: scale(1.015);
+  filter: saturate(1.03);
+}
+.paintings-archive-button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+}
+.lightbox-open {
+  overflow: hidden;
+}
+
+@media (max-width: 1100px) {
+  .paintings-archive { column-count: 4; }
+}
+@media (max-width: 860px) {
+  .paintings-archive { column-count: 3; }
+}
+@media (max-width: 620px) {
+  .paintings-archive { column-count: 2; }
+}
+@media (max-width: 380px) {
+  .paintings-archive { column-count: 1; }
+}
+
 /* 11 / 1000 project */
 .project-hero {
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.78fr);

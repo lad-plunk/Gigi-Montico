@@ -11,6 +11,8 @@ This repository contains the bilingual Italian/English static website for artist
 - `assets/js/site.js` contains shared navigation, reveal, tracking-parameter cleanup, and lightbox behavior.
 - `assets/data/archive.js` is the browser-loaded artwork catalog; `assets/data/archive.json` is its machine-readable equivalent.
 - `assets/js/catalog.js` renders archive and exhibition cards from the catalog.
+- `assets/data/paintings-archive.js` and `.json` describe the separate 326-photo archive; `assets/js/paintings-archive.js` renders its optimized preview/detail pairs.
+- `10_Working/build_paintings_archive.py` reproducibly rebuilds those web derivatives from an explicitly supplied external, read-only source folder.
 - `sitemap.xml`, `robots.txt`, `404.html`, and the Google verification file support custom-domain deployment and search indexing.
 - `mobile-audit-report.json` is retained QA evidence, not runtime site data.
 
@@ -18,7 +20,7 @@ This repository contains the bilingual Italian/English static website for artist
 
 - `en/`: English HTML pages.
 - `it/`: Italian HTML pages.
-- `assets/archive/`: full artwork images grouped by collection.
+- `assets/archive/`: exhibition media grouped by collection plus optimized preview/detail pairs for the paintings-photo archive.
 - `assets/books/`: downloadable PDF publications.
 - `assets/css/`: shared stylesheet.
 - `assets/data/`: artwork catalog in JS and JSON forms.
@@ -47,11 +49,15 @@ When changing content or navigation, update both language counterparts and their
 
 Approved staged-release exception: `it/11-1000.html` is currently Italian-only pending owner validation. Its EN language control intentionally routes to `en/index.html`; it does not declare a false English `hreflang` equivalent.
 
-## Catalog data flow
+## Catalog data flows
 
-`assets/data/archive.js` → `assets/js/catalog.js` → archive/exhibition HTML mount points → `assets/archive/<collection>/<work image>`
+Exhibitions: `assets/data/archive.js` → `assets/js/catalog.js` → exhibition HTML mount points → `assets/archive/<collection>/<work image>`
 
 The runtime catalog currently identifies 226 works in four collections: `AS`, `CP`, `LS`, and `DA`. Keep `archive.js` and `archive.json` semantically synchronized. An item path must resolve to a real media file, and `total` must equal the number of items.
+
+Photo archive: `assets/data/paintings-archive.js` → `assets/js/paintings-archive.js` → paired archive pages → `assets/archive/montico-paintings/{previews,full}/<image>`
+
+The photo archive declares 326 source photographs. Grid previews are lightweight WebP files; 1800-pixel detail derivatives load only when opened. The originals remain outside the repository and must be treated as read-only. Keep the JS/JSON manifests synchronized and regenerate both resolutions together.
 
 ## Safe change workflow
 
@@ -65,7 +71,7 @@ The runtime catalog currently identifies 226 works in four collections: `AS`, `C
 ## LLM context boundaries
 
 - Facts visible on the website live in the HTML pages and catalog data; do not invent missing biography, title, date, dimension, provenance, or critical claims.
-- `assets/data/archive.js` is the runtime source for rendered archive/exhibition cards. The JSON file is easier for analysis but is not loaded by current pages.
+- `assets/data/archive.js` remains the runtime source for exhibition cards. The archive pages use the separate `paintings-archive.js` manifest so exhibition grouping and metadata are not altered.
 - Large image and PDF folders are content stores. Inspect filenames and catalog metadata first; open binary files only when visual or textual verification is needed.
 - Do not edit `.git/` or treat its internal backup directories as project content.
 
@@ -75,5 +81,6 @@ The runtime catalog currently identifies 226 works in four collections: `AS`, `C
 - All local `href` and `src` targets exist (ignore URL fragments when checking paths).
 - `archive.json` parses and agrees with `archive.js` on catalog content.
 - Catalog item count equals `total`, IDs are unique, and every item media path exists.
+- `paintings-archive.json` agrees with its JS mirror, declares 326 unique IDs and source hashes, and every preview/full path and byte size matches the generated file.
 - Each established bilingual page has its intended counterpart; approved staged-release exceptions are documented above.
 - `sitemap.xml` contains all public HTML pages and no removed pages.
