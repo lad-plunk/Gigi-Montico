@@ -506,6 +506,35 @@ blockquote {
   outline: 3px solid var(--accent);
   outline-offset: -3px;
 }
+.paintings-archive-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.paintings-archive-progress[hidden] {
+  display: none;
+}
+.paintings-archive-progress button {
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+}
+.paintings-archive-progress button:hover {
+  background: #f4ece0;
+}
+.paintings-archive-progress button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
 .lightbox-open {
   overflow: hidden;
 }

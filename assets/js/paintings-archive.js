@@ -2,14 +2,18 @@
   const mount = document.getElementById('paintings-archive-root');
   const data = window.PAINTINGS_ARCHIVE;
   if (!mount || !data) return;
+  const progress = document.getElementById('paintings-archive-progress');
 
   const lang = (document.documentElement.lang || 'it').toLowerCase();
   const isItalian = lang.startsWith('it');
   const label = isItalian ? 'Apri fotografia opera' : 'Open artwork photograph';
   const safePath = (path) => encodeURI('../' + path.replace(/\\/g, '/'));
 
-  const fragment = document.createDocumentFragment();
-  (data.items || []).forEach((item, index) => {
+  const items = data.items || [];
+  const batchSize = 48;
+  let rendered = 0;
+
+  function buildItem(item, index) {
     const figure = document.createElement('figure');
     figure.className = 'paintings-archive-item';
 
@@ -30,9 +34,41 @@
 
     button.appendChild(image);
     figure.appendChild(button);
-    fragment.appendChild(figure);
-  });
+    return figure;
+  }
 
-  mount.replaceChildren(fragment);
-  window.dispatchEvent(new Event('catalog:rendered'));
+  function renderNextBatch() {
+    const end = Math.min(rendered + batchSize, items.length);
+    const fragment = document.createDocumentFragment();
+    for (let index = rendered; index < end; index += 1) {
+      fragment.appendChild(buildItem(items[index], index));
+    }
+    mount.appendChild(fragment);
+    rendered = end;
+
+    if (progress) {
+      const text = isItalian
+        ? `${rendered} di ${data.total} fotografie visualizzate`
+        : `${rendered} of ${data.total} photographs displayed`;
+      progress.querySelector('span').textContent = text;
+      progress.hidden = rendered >= items.length;
+    }
+    window.dispatchEvent(new Event('catalog:rendered'));
+  }
+
+  if (progress) {
+    const loadButton = progress.querySelector('button');
+    loadButton.addEventListener('click', renderNextBatch);
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        renderNextBatch();
+        if (rendered >= items.length) observer.disconnect();
+      }, { rootMargin: '700px 0px' });
+      observer.observe(progress);
+    }
+  }
+
+  renderNextBatch();
 })();
