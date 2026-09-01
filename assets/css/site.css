@@ -844,6 +844,7 @@ blockquote {
 
 @media (max-width: 860px) {
   .project-hero {
+    grid-template-columns: 1fr;
     min-height: 0;
   }
   .project-metrics,
