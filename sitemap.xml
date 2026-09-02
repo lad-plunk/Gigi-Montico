@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://artemontico.it/</loc>
-    <lastmod>2026-04-01</lastmod>
-  </url>
-  <url>
     <loc>https://artemontico.it/it/archivio.html</loc>
     <lastmod>2026-09-01</lastmod>
   </url>
@@ -47,10 +43,6 @@
   <url>
     <loc>https://artemontico.it/it/11-1000.html</loc>
     <lastmod>2026-09-01</lastmod>
-  </url>
-  <url>
-    <loc>https://artemontico.it/it/recensioni.html</loc>
-    <lastmod>2026-02-24</lastmod>
   </url>
   <url>
     <loc>https://artemontico.it/it/sostenibilita.html</loc>
@@ -98,10 +90,6 @@
   </url>
   <url>
     <loc>https://artemontico.it/en/montico-house.html</loc>
-    <lastmod>2026-02-24</lastmod>
-  </url>
-  <url>
-    <loc>https://artemontico.it/en/reviews.html</loc>
     <lastmod>2026-02-24</lastmod>
   </url>
   <url>

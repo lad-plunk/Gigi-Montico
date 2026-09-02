@@ -4,7 +4,7 @@ This repository contains the bilingual Italian/English static website for artist
 
 ## Start here
 
-- `index.html` is the root language entry point.
+- `index.html` redirects the apex domain to the Italian homepage, which is the default language; the English homepage remains directly available under `en/`.
 - `CNAME` binds the GitHub Pages deployment to `artemontico.it`.
 - `it/` and `en/` contain the Italian and English pages.
 - `assets/css/site.css` contains the shared visual system and responsive layout.
@@ -13,7 +13,7 @@ This repository contains the bilingual Italian/English static website for artist
 - `assets/js/catalog.js` renders archive and exhibition cards from the catalog.
 - `assets/data/paintings-archive.js` and `.json` describe the separate 326-photo archive; `assets/js/paintings-archive.js` renders its optimized preview/detail pairs.
 - `10_Working/build_paintings_archive.py` reproducibly rebuilds those web derivatives from an explicitly supplied external, read-only source folder.
-- `sitemap.xml`, `robots.txt`, `404.html`, and the Google verification file support custom-domain deployment and search indexing.
+- `sitemap.xml`, `robots.txt`, `404.html`, and the Google verification file support custom-domain deployment and search indexing. The sitemap lists indexable content pages only, not the root or legacy HTML redirect helpers.
 - `mobile-audit-report.json` is retained QA evidence, not runtime site data.
 
 ## Repository map
