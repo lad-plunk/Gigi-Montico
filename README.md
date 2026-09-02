@@ -14,6 +14,7 @@ This repository contains the bilingual Italian/English static website for artist
 - `assets/data/paintings-archive.js` and `.json` describe the separate 326-photo archive; `assets/js/paintings-archive.js` renders its optimized preview/detail pairs.
 - `10_Working/build_paintings_archive.py` reproducibly rebuilds those web derivatives from an explicitly supplied external, read-only source folder.
 - `sitemap.xml`, `robots.txt`, `404.html`, and the Google verification file support custom-domain deployment and search indexing. The sitemap lists indexable content pages only, not the root or legacy HTML redirect helpers.
+- `favicon.svg`, `favicon.ico`, `favicon-32x32.png`, and `apple-touch-icon.png` provide the shared burgundy-and-cream GM browser and mobile identity used by every public page.
 - `mobile-audit-report.json` is retained QA evidence, not runtime site data.
 
 ## Repository map
