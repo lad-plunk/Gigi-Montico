@@ -1,6 +1,6 @@
 # Pagine italiane
 
-Questa cartella contiene 13 pagine HTML pubbliche in italiano. Ogni pagina ha una controparte inglese in `../en/`; la mappatura è elencata nel `README.md` principale.
+Questa cartella contiene 14 pagine HTML pubbliche in italiano. Ogni pagina ha una controparte inglese in `../en/`; la mappatura è elencata nel `README.md` principale. `privacy.html` descrive il trattamento tecnico e l'uso facoltativo di Google Analytics.
 
 Le pagine condividono `../assets/css/site.css` e `../assets/js/site.js`. Le pagine di archivio e delle mostre tematiche caricano inoltre `../assets/data/archive.js`, seguito da `../assets/js/catalog.js`.
 

@@ -8,7 +8,7 @@ This repository contains the bilingual Italian/English static website for artist
 - `CNAME` binds the GitHub Pages deployment to `artemontico.it`.
 - `it/` and `en/` contain the Italian and English pages.
 - `assets/css/site.css` contains the shared visual system and responsive layout.
-- `assets/js/site.js` contains shared navigation, reveal, tracking-parameter cleanup, and lightbox behavior.
+- `assets/js/site.js` contains shared navigation, reveal, tracking-parameter cleanup, consent-gated Google Analytics, privacy controls, and lightbox behavior.
 - `assets/data/archive.js` is the browser-loaded artwork catalog; `assets/data/archive.json` is its machine-readable equivalent.
 - `assets/js/catalog.js` renders archive and exhibition cards from the catalog.
 - `assets/data/paintings-archive.js` and `.json` describe the separate 326-photo archive; `assets/js/paintings-archive.js` renders its optimized preview/detail pairs.
@@ -45,10 +45,15 @@ Every project folder has its own `README.md` with local ownership and maintenanc
 - `en/sustainability.html` ↔ `it/sostenibilita.html`
 - `en/montico-house.html` ↔ `it/casa-montico.html`
 - `en/11-1000.html` ↔ `it/11-1000.html`
+- `en/privacy.html` ↔ `it/privacy.html`
 
 When changing content or navigation, update both language counterparts and their metadata: title, description, canonical URL, `hreflang`, Open Graph, Twitter card, structured data, navigation state, and language switch.
 
 The `11 / 1000` project is published in both languages. Both localized project pages link to the same authoritative completed Italian RC10 PDF until a finalized English book edition is explicitly approved.
+
+## Privacy-conscious analytics
+
+Google Analytics 4 uses measurement ID `G-R345WTHYJX` through the shared `site.js`. The implementation uses basic consent mode: the Google tag is not requested before an explicit acceptance. Rejecting analytics leaves the tag unloaded; visitors can reopen the equal-choice controls from every page footer. Advertising storage, Google Signals, and advertising personalization remain disabled. The localized privacy pages document the controller, purposes, cookies, retention target, and withdrawal route.
 
 ## Catalog data flows
 

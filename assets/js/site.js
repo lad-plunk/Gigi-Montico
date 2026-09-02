@@ -1,4 +1,172 @@
 (() => {
+  const ANALYTICS_MEASUREMENT_ID = 'G-R345WTHYJX';
+  const CONSENT_STORAGE_KEY = 'gm_analytics_consent_v1';
+  const isItalianPage = (document.documentElement.lang || '').toLowerCase().startsWith('it');
+
+  function readConsent() {
+    try {
+      const value = window.localStorage.getItem(CONSENT_STORAGE_KEY);
+      return value === 'accepted' || value === 'rejected' ? value : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function writeConsent(value) {
+    try {
+      window.localStorage.setItem(CONSENT_STORAGE_KEY, value);
+    } catch (_) {
+      // If storage is unavailable, the visitor will be asked again next time.
+    }
+  }
+
+  function deleteAnalyticsCookies() {
+    const cookieNames = document.cookie
+      .split(';')
+      .map((item) => item.split('=')[0].trim())
+      .filter((name) => name === '_ga' || name.startsWith('_ga_'));
+
+    cookieNames.forEach((name) => {
+      document.cookie = `${name}=; Max-Age=0; path=/; SameSite=Lax`;
+      document.cookie = `${name}=; Max-Age=0; path=/; domain=.artemontico.it; SameSite=Lax`;
+    });
+  }
+
+  function ensureGtag() {
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function gtag() {
+      window.dataLayer.push(arguments);
+    };
+  }
+
+  function loadAnalytics() {
+    if (document.querySelector(`script[data-ga-id="${ANALYTICS_MEASUREMENT_ID}"]`)) return;
+
+    ensureGtag();
+    window.gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied'
+    });
+    window.gtag('consent', 'update', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'granted'
+    });
+    window.gtag('js', new Date());
+    window.gtag('config', ANALYTICS_MEASUREMENT_ID, {
+      allow_google_signals: false,
+      allow_ad_personalization_signals: false,
+      cookie_expires: 34128000,
+      cookie_update: false,
+      content_group: isItalianPage ? 'Italian' : 'English'
+    });
+
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(ANALYTICS_MEASUREMENT_ID)}`;
+    script.dataset.gaId = ANALYTICS_MEASUREMENT_ID;
+    document.head.appendChild(script);
+  }
+
+  function revokeAnalytics() {
+    ensureGtag();
+    window.gtag('consent', 'update', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied'
+    });
+    deleteAnalyticsCookies();
+  }
+
+  function setupConsentControls() {
+    const labels = isItalianPage
+      ? {
+          title: 'Statistiche facoltative',
+          text: 'Con il tuo consenso usiamo Google Analytics per capire quali pagine e lingue sono più consultate. Nessun dato viene inviato prima della scelta.',
+          accept: 'Accetta',
+          reject: 'Rifiuta',
+          privacy: 'Privacy e cookie',
+          manage: 'Gestisci preferenze'
+        }
+      : {
+          title: 'Optional analytics',
+          text: 'With your consent, we use Google Analytics to understand which pages and languages are visited most. No data is sent before you choose.',
+          accept: 'Accept',
+          reject: 'Reject',
+          privacy: 'Privacy and cookies',
+          manage: 'Manage preferences'
+        };
+
+    const privacyHref = 'privacy.html';
+    const footer = document.querySelector('.site-footer');
+    if (footer && !footer.querySelector('.privacy-controls')) {
+      const controls = document.createElement('div');
+      controls.className = 'privacy-controls';
+      controls.innerHTML = `<a href="${privacyHref}">${labels.privacy}</a><button type="button">${labels.manage}</button>`;
+      footer.appendChild(controls);
+    }
+
+    const banner = document.createElement('aside');
+    banner.className = 'consent-banner';
+    banner.setAttribute('role', 'dialog');
+    banner.setAttribute('aria-modal', 'false');
+    banner.setAttribute('aria-labelledby', 'consent-title');
+    banner.hidden = true;
+    banner.innerHTML = `
+      <div class="consent-copy">
+        <strong id="consent-title">${labels.title}</strong>
+        <p>${labels.text} <a href="${privacyHref}">${labels.privacy}</a>.</p>
+      </div>
+      <div class="consent-actions">
+        <button type="button" data-consent="rejected">${labels.reject}</button>
+        <button type="button" data-consent="accepted">${labels.accept}</button>
+      </div>`;
+    document.body.appendChild(banner);
+
+    function showBanner() {
+      banner.hidden = false;
+      banner.querySelector('[data-consent="rejected"]').focus();
+    }
+
+    function hideBanner() {
+      banner.hidden = true;
+    }
+
+    banner.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-consent]');
+      if (!button) return;
+
+      const choice = button.dataset.consent;
+      writeConsent(choice);
+      if (choice === 'accepted') {
+        loadAnalytics();
+      } else {
+        const analyticsWasLoaded = Boolean(
+          document.querySelector(`script[data-ga-id="${ANALYTICS_MEASUREMENT_ID}"]`)
+        );
+        revokeAnalytics();
+        if (analyticsWasLoaded) {
+          window.location.reload();
+          return;
+        }
+      }
+      hideBanner();
+    });
+
+    footer?.querySelector('.privacy-controls button')?.addEventListener('click', showBanner);
+
+    const savedConsent = readConsent();
+    if (savedConsent === 'accepted') {
+      loadAnalytics();
+    } else if (!savedConsent) {
+      showBanner();
+    }
+  }
+
   function stripTrackingParams() {
     if (!window.history || typeof window.history.replaceState !== 'function') return;
 
@@ -36,6 +204,8 @@
   stripTrackingParams();
 
   document.documentElement.classList.add('js');
+
+  setupConsentControls();
 
   function setupMobileNav() {
     const header = document.querySelector('.site-header');
@@ -118,7 +288,7 @@
 
   const lightbox = document.createElement('div');
   lightbox.className = 'lightbox';
-  const isItalian = (document.documentElement.lang || '').toLowerCase().startsWith('it');
+  const isItalian = isItalianPage;
   lightbox.setAttribute('role', 'dialog');
   lightbox.setAttribute('aria-modal', 'true');
   lightbox.setAttribute('aria-label', isItalian ? 'Immagine ingrandita' : 'Enlarged image');
