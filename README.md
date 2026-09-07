@@ -50,7 +50,7 @@ Every project folder has its own `README.md` with local ownership and maintenanc
 
 When changing content or navigation, update both language counterparts and their metadata: title, description, canonical URL, `hreflang`, Open Graph, Twitter card, structured data, navigation state, and language switch.
 
-The `11 / 1000` project is published in both languages. Both localized project pages link to the same authoritative completed Italian RC10 PDF until a finalized English book edition is explicitly approved.
+The `11 / 1000` project is published in both languages. Each localized project page links to its corresponding completed RC11 PDF: Italian from `it/11-1000.html` and English from `en/11-1000.html`.
 
 ## Privacy-conscious analytics
 
