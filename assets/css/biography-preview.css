@@ -15,11 +15,12 @@
 .preview-page main { width: min(1160px, 92vw); }
 .preview-page .preview-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.03fr) minmax(320px, .97fr);
+  grid-template-columns: 1fr;
   gap: clamp(1.4rem, 4vw, 4.4rem);
-  align-items: center;
+  align-items: start;
   padding: 4.4rem 0 3.2rem;
 }
+.preview-page .preview-hero > div:first-child { max-width: 68rem; }
 .preview-page .preview-kicker {
   margin: 0 0 .7rem;
   color: var(--preview-accent);
@@ -43,22 +44,29 @@
 .preview-page .preview-hero-art { position: relative; }
 .preview-page .preview-portrait-pair {
   display: grid;
-  grid-template-columns: 1.12fr .88fr;
-  gap: .75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2.5vw, 2rem);
   align-items: stretch;
+}
+.preview-page .preview-hero-art {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 28px;
+  background: #eee8db;
+  box-shadow: 0 24px 65px rgba(22, 16, 12, .16);
 }
 .preview-page .preview-hero-art img {
   width: 100%;
   height: 100%;
-  min-height: 470px;
-  max-height: 640px;
   object-fit: cover;
-  object-position: 45% center;
-  border-radius: 28px;
+  object-position: 42% center;
+  border-radius: inherit;
   border: 1px solid color-mix(in srgb, var(--preview-accent) 35%, white 65%);
-  box-shadow: 0 24px 65px rgba(22, 16, 12, .2);
 }
-.preview-page .preview-self-portrait img { object-position: center; }
+.preview-page .preview-self-portrait img {
+  object-fit: contain;
+  object-position: center;
+}
 .preview-page .preview-art-caption {
   position: absolute;
   right: 1rem;
@@ -255,7 +263,6 @@
 .preview-page .preview-footer-note { color: var(--preview-muted); font-size: .86rem; }
 
 @media (max-width: 980px) {
-  .preview-page .preview-hero { grid-template-columns: 1fr; }
   .preview-page .preview-hero h1 { max-width: 15ch; }
   .preview-page .period-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .preview-page .phase-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -268,7 +275,9 @@
   .preview-page .preview-stat-strip, .preview-page .preview-lanes, .preview-page .milestone-grid { grid-template-columns: 1fr; }
   .preview-page .period-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .preview-page .preview-portrait-pair { grid-template-columns: 1fr; }
-  .preview-page .preview-hero-art img { min-height: 0; max-height: 68vh; }
+  .preview-page .preview-hero-art { aspect-ratio: auto; }
+  .preview-page .preview-hero-art img { height: auto; max-height: 78vh; }
+  .preview-page .preview-self-portrait img { width: 100%; max-height: none; }
   .preview-page .preview-download { display: block; }
   .preview-page .preview-download .btn { display: inline-block; margin-top: 1rem; }
   .preview-page .balance-list { grid-template-columns: 1fr; }
@@ -282,7 +291,6 @@
   .preview-page .preview-hero h1 { font-size: 2.65rem; }
   .preview-page .period-grid { grid-template-columns: 1fr 1fr; gap: .4rem; }
   .preview-page .preview-portrait-pair, .preview-page .phase-grid { grid-template-columns: 1fr; }
-  .preview-page .preview-hero-art img { min-height: 0; max-height: 72vh; }
   .preview-page .period-button { padding: .6rem; }
   .preview-page .period-title { font-size: .82rem; }
 }
