@@ -20,7 +20,7 @@
   align-items: start;
   padding: 4.4rem 0 3.2rem;
 }
-.preview-page .preview-hero > div:first-child { max-width: 68rem; }
+.preview-page .preview-hero > div:first-child { max-width: none; }
 .preview-page .preview-kicker {
   margin: 0 0 .7rem;
   color: var(--preview-accent);
@@ -30,12 +30,12 @@
   font-weight: 700;
 }
 .preview-page .preview-hero h1 {
-  max-width: 11ch;
+  max-width: none;
   margin: 0 0 1.25rem;
   font-size: clamp(2.4rem, 5.5vw, 5.3rem);
   line-height: .96;
 }
-.preview-page .preview-hero .lead { max-width: 58ch; font-size: 1.14rem; }
+.preview-page .preview-hero .lead { max-width: none; font-size: 1.14rem; }
 .preview-page .preview-hero-note {
   margin: 1.2rem 0 0;
   color: var(--preview-muted);
@@ -104,8 +104,8 @@
 .preview-page .preview-stat span { display: block; margin-top: .45rem; color: var(--preview-muted); font-size: .9rem; }
 
 .preview-page .preview-section { padding: 3rem 0; border-top: 1px solid var(--preview-line); }
-.preview-page .preview-section-heading { display: flex; justify-content: space-between; gap: 1.5rem; align-items: end; }
-.preview-page .preview-section-heading p { max-width: 54ch; margin: 0; color: var(--preview-muted); }
+.preview-page .preview-section-heading { display: block; }
+.preview-page .preview-section-heading p { max-width: none; margin: 0; color: var(--preview-muted); }
 .preview-page .preview-section-heading h2 { margin-bottom: .55rem; }
 .preview-page .research-intro { max-width: none; }
 .preview-page .research-intro h2 { max-width: none; margin-bottom: .75rem; }
@@ -172,7 +172,7 @@
 .preview-page .period-highlights li + li { margin-top: .35rem; }
 .preview-page .preview-disclaimer { margin: .85rem 0 0; color: var(--preview-muted); font-size: .84rem; }
 
-.preview-page .phase-intro { max-width: 68ch; margin: 1.25rem 0 0; color: var(--preview-muted); }
+.preview-page .phase-intro { max-width: none; margin: 1.25rem 0 0; color: var(--preview-muted); }
 .preview-page .phase-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -263,7 +263,7 @@
 .preview-page .preview-footer-note { color: var(--preview-muted); font-size: .86rem; }
 
 @media (max-width: 980px) {
-  .preview-page .preview-hero h1 { max-width: 15ch; }
+  .preview-page .preview-hero h1 { max-width: none; }
   .preview-page .period-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .preview-page .phase-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .preview-page .phase-card,
@@ -283,7 +283,6 @@
   .preview-page .balance-list { grid-template-columns: 1fr; }
   .preview-page .period-button { min-height: 10.2rem; }
   .preview-page .milestone { grid-template-columns: 5.8rem 1fr; }
-  .preview-page .preview-section-heading { display: block; }
   .preview-page .preview-section-heading p { margin-top: .4rem; }
 }
 @media (max-width: 440px) {
