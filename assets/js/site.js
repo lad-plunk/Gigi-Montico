@@ -2,6 +2,7 @@
   const ANALYTICS_MEASUREMENT_ID = 'G-R345WTHYJX';
   const CONSENT_STORAGE_KEY = 'gm_analytics_consent_v1';
   const isItalianPage = (document.documentElement.lang || '').toLowerCase().startsWith('it');
+  let analyticsReady = false;
 
   function readConsent() {
     try {
@@ -63,12 +64,30 @@
       cookie_update: false,
       content_group: isItalianPage ? 'Italian' : 'English'
     });
+    analyticsReady = true;
 
     const script = document.createElement('script');
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(ANALYTICS_MEASUREMENT_ID)}`;
     script.dataset.gaId = ANALYTICS_MEASUREMENT_ID;
     document.head.appendChild(script);
+  }
+
+  function trackEvent(name, parameters = {}) {
+    if (!analyticsReady || typeof window.gtag !== 'function') return;
+    window.gtag('event', name, parameters);
+  }
+
+  function setupAnalyticsEvents() {
+    document.addEventListener('click', (event) => {
+      const link = event.target.closest('a[href^="mailto:"]');
+      if (!link || link.closest('.privacy-controls')) return;
+
+      trackEvent('contact_click', {
+        contact_method: 'email',
+        link_text: (link.textContent || '').trim().slice(0, 80)
+      });
+    });
   }
 
   function revokeAnalytics() {
@@ -206,6 +225,7 @@
   document.documentElement.classList.add('js');
 
   setupConsentControls();
+  setupAnalyticsEvents();
 
   function setupMobileNav() {
     const header = document.querySelector('.site-header');
