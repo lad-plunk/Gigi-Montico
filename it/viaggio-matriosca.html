@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Un'opera dentro l'altra | Gigi Montico</title>
+  <meta name="description" content="Un viaggio sperimentale tra quadri, scultura e materia, immaginato dalle opere di Gigi Montico.">
+  <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#15282b">
+  <link rel="canonical" href="https://artemontico.it/it/viaggio-matriosca.html"><link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/matriosca.css"><script src="../assets/js/matriosca.js" defer></script>
+</head>
+<body class="nest-view">
+  <canvas id="world" tabindex="0" aria-label="Spazio tridimensionale da esplorare"></canvas>
+  <header class="nest-header"><a href="paesaggi-immersivi.html">&#8592; Tutte le opere</a><span>Gigi Montico</span><button id="helpBtn" type="button" aria-label="Istruzioni">?</button></header>
+  <main class="nest-caption" aria-live="polite"><p id="stageNumber">01 / 04</p><h1 id="stageTitle">Fabbriche</h1><p id="stageText">Un quadro ne custodisce un altro.</p></main>
+  <div class="nest-actions" id="actions"><button id="previous" type="button" hidden>&#8592; Indietro</button><button class="primary" id="next" type="button">Entra nel quadro &#8594;</button><button id="scatter" type="button" hidden>Disgrega</button><button id="gather" type="button" hidden>Ricomponi</button></div>
+  <div class="nest-touch" aria-label="Comandi di movimento"><div class="nest-pad"><button class="forward" data-move="forward" type="button" aria-label="Avanti">&#9650;</button><button class="left" data-move="left" type="button" aria-label="A sinistra">&#9664;</button><button class="back" data-move="back" type="button" aria-label="Indietro">&#9660;</button><button class="right" data-move="right" type="button" aria-label="A destra">&#9654;</button></div><div class="nest-altitude"><button data-move="up" type="button" aria-label="Sali">+</button><button data-move="down" type="button" aria-label="Scendi">&#8722;</button></div></div>
+  <div class="nest-transition" id="transition" aria-hidden="true"></div>
+  <div class="nest-modal" id="welcome"><div class="nest-dialog nest-intro" role="dialog" aria-modal="true" aria-labelledby="introTitle"><div class="nest-intro-art" aria-hidden="true"><img src="../assets/images/hi-fabbriche.jpg" alt=""><img src="../assets/images/private-teatrino-infinito.jpg" alt=""><img src="../assets/images/casa-montico/casa-montico-001.jpg" alt=""></div><div class="nest-dialog-body"><p class="nest-kicker">Un'esplorazione sperimentale</p><h2 id="introTitle">Un'opera dentro l'altra</h2><p>Entra in un quadro, attraversane un altro e scopri una scultura. Al suo interno, la materia può separarsi e ricomporsi.</p><p class="nest-help-text">Su iPhone trascina per guardare e usa le frecce per muoverti. I pulsanti accompagnano il viaggio anche senza muoversi.</p><button id="start" class="primary" type="button" disabled>Caricamento...</button></div></div></div>
+  <div class="nest-modal" id="help" hidden><div class="nest-dialog nest-help" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><button id="closeHelp" class="nest-close" type="button">Chiudi</button><div class="nest-dialog-body"><h2 id="helpTitle">Come esplorare</h2><p>Trascina con un dito o con il mouse per guardare. Su iPhone tieni premute le frecce per muoverti e usa + / − per salire o scendere.</p><p>Al computer usa W A S D o le frecce; E / Q per salire e scendere; J / L e I / K per guardare con la tastiera.</p><p>I pulsanti ti portano da un livello all'altro. Le forme sono interpretazioni immaginate a partire dalle opere e dai materiali di Montico.</p><button id="restart" class="primary" type="button">Ricomincia il viaggio</button></div></div></div>
+  <div class="nest-error" id="error" role="alert" hidden><h1>Impossibile aprire il viaggio</h1><p>Riprova con una versione recente di Safari, Chrome o Edge.</p><a href="paesaggi-immersivi.html">Torna alle opere</a></div>
+  <noscript>Per esplorare il viaggio è necessario attivare JavaScript.</noscript>
+</body></html>
