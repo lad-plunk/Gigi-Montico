@@ -38,17 +38,17 @@
     const sceneProgram=program(`
       attribute vec3 aPos; attribute vec3 aNormal; attribute vec2 aUV; attribute vec3 aColor; attribute vec3 aOffset;
       uniform mat4 uVP; uniform vec3 uCamera; uniform float uScatter;
-      varying vec2 vUV; varying vec3 vColor; varying float vLight; varying float vDist;
+      varying vec2 vUV; varying vec2 vDetailUV; varying vec3 vColor; varying float vLight; varying float vDist; varying float vDetailMix;
       void main(){
         vec3 pos=aPos+aOffset*uScatter;
-        vUV=aUV;vColor=aColor;vDist=distance(pos,uCamera);
+        vUV=aUV;vDetailUV=vec2(pos.x*.14+pos.y*.10,pos.z*.14+pos.y*.09);vColor=aColor;vDetailMix=.22+.50*max(aNormal.y,0.0);vDist=distance(pos,uCamera);
         vLight=.73+.27*max(dot(normalize(aNormal),normalize(vec3(-.4,.85,.35))),0.0);
         gl_Position=uVP*vec4(pos,1.0);
       }`, `
-      precision mediump float; uniform sampler2D uImage; uniform vec3 uFog; uniform float uMix;
-      varying vec2 vUV; varying vec3 vColor; varying float vLight; varying float vDist;
+      precision mediump float; uniform sampler2D uImage; uniform sampler2D uDetail; uniform vec3 uFog; uniform float uMix;
+      varying vec2 vUV; varying vec2 vDetailUV; varying vec3 vColor; varying float vLight; varying float vDist; varying float vDetailMix;
       void main(){
-        vec3 pigment=texture2D(uImage,vUV).rgb;
+        vec3 pigment=mix(texture2D(uImage,vUV).rgb,texture2D(uDetail,vDetailUV).rgb,vDetailMix);
         vec3 c=mix(vColor,pigment,uMix)*vLight;
         c=mix(c,uFog,smoothstep(25.0,72.0,vDist)*.58);
         gl_FragColor=vec4(c,1.0);
@@ -56,16 +56,21 @@
     const skyProgram=program(`
       attribute vec3 aPos; attribute vec2 aUV; uniform mat4 uVP; uniform vec3 uCamera; varying vec2 vUV;
       void main(){vUV=aUV;gl_Position=uVP*vec4(aPos+uCamera,1.0);}`, `
-      precision mediump float; uniform sampler2D uImage; varying vec2 vUV;
-      void main(){gl_FragColor=vec4(texture2D(uImage,vUV).rgb*.87+vec3(.025),1.0);}`);
-    function texture(source) {
+      precision mediump float; uniform sampler2D uImage; uniform sampler2D uDetail; varying vec2 vUV;
+      void main(){
+        vec3 background=texture2D(uImage,vUV).rgb;
+        vec3 detail=texture2D(uDetail,vUV*vec2(12.0,6.0)).rgb;
+        gl_FragColor=vec4(mix(background,detail,.55)*.87+vec3(.025),1.0);
+      }`);
+    function texture(source,repeat) {
       const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
       gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,source);
-      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);return t;
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,repeat?gl.MIRRORED_REPEAT:gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,repeat?gl.MIRRORED_REPEAT:gl.CLAMP_TO_EDGE);
+      if(repeat)gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,repeat?gl.LINEAR_MIPMAP_LINEAR:gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);return t;
     }
     function resized(img) {
-      const scale=Math.min(1,1024/Math.max(img.width,img.height)),c=document.createElement('canvas');
+      const scale=Math.min(1,1536/Math.max(img.width,img.height)),c=document.createElement('canvas');
       c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);return c;
     }
     const textures={fabbriche:texture(resized(images[0])),teatrino:texture(resized(images[1])),viaggio:texture(resized(images[3]))};
@@ -74,16 +79,38 @@
     wood.getContext('2d').drawImage(images[2],images[2].width*.49,images[2].height*.19,images[2].width*.12,images[2].height*.09,0,0,384,384);
     textures.wood=texture(wood);
     function makeSky(img,crop,fog) {
-      const c=document.createElement('canvas');c.width=1024;c.height=512;const ctx=c.getContext('2d');
+      const c=document.createElement('canvas');c.width=1536;c.height=768;const ctx=c.getContext('2d');
       for(let i=0;i<2;i++){
-        ctx.save();ctx.translate(i*512+(i%2?512:0),0);if(i%2)ctx.scale(-1,1);
-        ctx.drawImage(img,img.width*crop[0],img.height*crop[1],img.width*crop[2],img.height*crop[3],0,0,512,370);ctx.restore();
+        ctx.save();ctx.translate(i*768+(i%2?768:0),0);if(i%2)ctx.scale(-1,1);
+        ctx.drawImage(img,img.width*crop[0],img.height*crop[1],img.width*crop[2],img.height*crop[3],0,0,768,555);ctx.restore();
       }
-      const rgb=fog.map(v=>Math.round(v*255));const grad=ctx.createLinearGradient(0,355,0,512);
+      const rgb=fog.map(v=>Math.round(v*255));const grad=ctx.createLinearGradient(0,532,0,768);
       grad.addColorStop(0,`rgba(${rgb[0]},${rgb[1]},${rgb[2]},0)`);grad.addColorStop(1,`rgb(${rgb[0]},${rgb[1]},${rgb[2]})`);
-      ctx.fillStyle=grad;ctx.fillRect(0,355,1024,157);return texture(c);
+      ctx.fillStyle=grad;ctx.fillRect(0,532,1536,236);return texture(c);
     }
-    const skyTextures=[makeSky(images[0],[0,0,1,.55],stages[0].fog),makeSky(images[1],[.10,.1,.8,.68],stages[1].fog),makeSky(wood,[0,0,1,1],stages[2].fog),makeSky(images[3],[.1,.08,.8,.72],stages[3].fog)];
+    function makeDetail(img,crop){
+      const c=document.createElement('canvas');c.width=512;c.height=512;
+      const ctx=c.getContext('2d');
+      ctx.drawImage(img,img.width*(crop[0]+crop[2]*.33),img.height*(crop[1]+crop[3]*.22),img.width*crop[2]*.34,img.height*crop[3]*.50,0,0,512,512);
+      if(img===wood){
+        // The photographed wood is a small crop. Invent fine grain over it at a usable scale.
+        let grainSeed=98171;const grainRandom=()=>{grainSeed=(Math.imul(grainSeed,1664525)+1013904223)>>>0;return grainSeed/4294967296;};
+        for(let i=0;i<125;i++){
+          const x=grainRandom()*560-24,phase=grainRandom()*Math.PI*2,wave=3+grainRandom()*9;
+          ctx.beginPath();ctx.moveTo(x+Math.sin(phase)*wave,-12);
+          for(let y=20;y<=540;y+=20)ctx.lineTo(x+Math.sin(y/52+phase)*wave+Math.sin(y/17+phase)*2,y);
+          ctx.strokeStyle=i%3===0?'rgba(235,190,143,.38)':'rgba(43,23,15,.28)';ctx.lineWidth=.9+grainRandom()*2.6;ctx.stroke();
+        }
+        for(let i=0;i<18;i++){
+          ctx.beginPath();ctx.ellipse(grainRandom()*512,grainRandom()*512,2+grainRandom()*4,6+grainRandom()*14,grainRandom()*.4,0,Math.PI*2);
+          ctx.strokeStyle='rgba(52,27,15,.32)';ctx.lineWidth=1.6;ctx.stroke();
+        }
+      }
+      return texture(c,true);
+    }
+    const backgrounds=[[images[0],[0,0,1,.55]],[images[1],[.10,.1,.8,.68]],[wood,[0,0,1,1]],[images[3],[.1,.08,.8,.72]]];
+    const skyTextures=backgrounds.map(([img,crop],i)=>makeSky(img,crop,stages[i].fog));
+    const detailTextures=backgrounds.map(([img,crop])=>makeDetail(img,crop));
     let seed=718219;const rand=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
     const between=(a,b)=>a+(b-a)*rand();const crop=()=>{const u=rand()*.65,v=rand()*.62;return [u,v,u+.28,v+.30];};
     const palettes={green:[[.18,.38,.31],[.42,.60,.47],[.63,.68,.54],[.58,.20,.18],[.15,.22,.20]],wood:[[.43,.24,.16],[.64,.38,.25],[.28,.18,.13],[.72,.52,.34]],cloth:[[.57,.37,.47],[.78,.59,.63],[.88,.74,.67]],metal:[[.18,.40,.30],[.36,.53,.39],[.71,.43,.23]]};
@@ -113,12 +140,20 @@
           quad(group,p(a,u1,v1),p(a,u2,v2),p(b,u2,v2),p(b,u1,v1),norm(n),uv,col,off);
       }
       function curve(group,points,radii,col,off){
-        const rings=[],sides=10;
+        // Interpolate the hand-placed silhouettes into smoother, irregular wood-like forms.
+        const smoothPoints=[],smoothRadii=[],subdivisions=3;
+        for(let i=0;i<points.length-1;i++)for(let step=0;step<subdivisions;step++){
+          const t=step/subdivisions,t2=t*t,t3=t2*t,p0=points[Math.max(0,i-1)],p1=points[i],p2=points[i+1],p3=points[Math.min(points.length-1,i+2)];
+          smoothPoints.push(p1.map((_,k)=>.5*((2*p1[k])+(-p0[k]+p2[k])*t+(2*p0[k]-5*p1[k]+4*p2[k]-p3[k])*t2+(-p0[k]+3*p1[k]-3*p2[k]+p3[k])*t3)));
+          smoothRadii.push(radii[i]*(1-t)+radii[i+1]*t);
+        }
+        smoothPoints.push(points[points.length-1]);smoothRadii.push(radii[radii.length-1]);points=smoothPoints;radii=smoothRadii;
+        const rings=[],sides=12;
         for(let i=0;i<points.length;i++){
           const before=points[Math.max(0,i-1)],after=points[Math.min(points.length-1,i+1)],dir=norm(after.map((x,k)=>x-before[k]));
           const ref=Math.abs(dir[1])>.85?[1,0,0]:[0,1,0],u=norm(vecCross(dir,ref)),v=norm(vecCross(dir,u));const ring=[];
           for(let j=0;j<=sides;j++){
-            const a=j*2*Math.PI/sides,r=radii[i]*(.88+.12*Math.sin(j*3.1+i*1.37));
+            const a=j*2*Math.PI/sides,r=radii[i]*(.90+.10*Math.sin(j*3.1+i*.38));
             const n=norm(u.map((x,k)=>x*Math.cos(a)+v[k]*Math.sin(a)));
             ring.push({p:points[i].map((x,k)=>x+n[k]*r),n});
           }
@@ -148,12 +183,18 @@
         const pt=(i,j)=>{const u=i/nx,v=j/ny;return [x+(u-.5)*w,y+v*h,z+Math.sin(u*8+v*2)*.16+Math.cos(v*7)*.08];};
         for(let j=0;j<ny;j++)for(let i=0;i<nx;i++)quad(group,pt(i,j),pt(i+1,j),pt(i+1,j+1),pt(i,j+1),[0,0,1],[uv[0]+(uv[2]-uv[0])*i/nx,uv[1]+(uv[3]-uv[1])*j/ny,uv[0]+(uv[2]-uv[0])*(i+1)/nx,uv[1]+(uv[3]-uv[1])*(j+1)/ny],col,off);
       }
+      function root(x,z,h,col){
+        const lean=between(-1.6,1.6),bend=between(-.7,.7);
+        const p=[[x,0,z],[x+bend,h*.34,z+.18],[x+lean*.65,h*.7,z+.38],[x+lean,h,z+.6]];
+        curve('wood',p,[.25,.20,.12,.035],col);
+        curve('wood',[p[1],[p[1][0]+between(-1.3,1.3),h*.62,z+.35],[p[1][0]+between(-1.6,1.6),h*.84,z+.65]],[.12,.08,.025],col);
+      }
       function finish(){
         const out=[];
         for(const group of Object.keys(data))if(data[group].length){const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(data[group]),gl.STATIC_DRAW);out.push({texture:textures[group],count:data[group].length/14,buffer:b,group});}
         return out;
       }
-      return {quad,box,beam,curve,frame,painting,ring,disk,ribbon,finish};
+      return {quad,box,beam,curve,frame,painting,ring,disk,ribbon,root,finish};
     }
     const worlds=[];
     {
@@ -165,6 +206,12 @@
         for(let j=0;j<Math.floor(w*3);j++)b.box('fabbriche',x-w/2+j*w/Math.floor(w*3),.02,z+d/2+.03,.05,h,.05,palettes.green[j%5]);
       }
       for(let z=-8;z>=-38;z-=10)b.beam('fabbriche',[-19,8,z],[19,8,z],.25,palettes.green[4]);
+      for(let i=0;i<22;i++){
+        const side=i%2?1:-1,x=side*between(5,22),z=between(-45,15);
+        b.root(x,z,between(2.5,6),color('wood'));
+        if(i%2===0)b.ribbon('fabbriche',x,between(2.2,4.5),z,between(.5,1.5),between(1.2,3),color('green'),null,crop());
+      }
+      for(let i=0;i<45;i++){const side=i%2?1:-1;b.box('fabbriche',side*between(4,22),between(.6,8),between(-43,17),between(.10,.4),between(.15,.55),.08,color('green'));}
       b.painting('teatrino',0,1.5,-15,9,6.8,[.35,.23,.17]);
       worlds.push(b.finish());
     }
@@ -172,6 +219,11 @@
       const b=builder();b.quad('teatrino',[-45,0,40],[45,0,40],[45,0,-55],[-45,0,-55],[0,1,0],[0,0,1,.7],[.18,.27,.25]);
       for(let z=5;z>=-41;z-=9){b.frame('teatrino',0,z,9,9,[.15,.27,.23],.30);b.frame('teatrino',-10,z,8,9,[.31,.43,.37],.20);b.frame('teatrino',10,z,8,9,[.31,.43,.37],.20);}
       for(let i=0;i<4;i++)for(let j=0;j<26;j++){const x=-18+j*1.4,y=1.8+i*.14+Math.sin(j*.3+i*.3)*.45;b.beam('teatrino',[x,y,-23+i*.1],[x+1.45,y+.08,-23+i*.1],.10,[.72,.17,.14]);}
+      for(let i=0;i<18;i++){
+        const side=i%2?1:-1,x=side*between(5.5,20),z=between(-42,12);
+        b.ribbon('teatrino',x,between(2.4,5),z,between(.6,1.8),between(1.5,4),color('cloth'),null,crop());
+        if(i%2===0)b.root(x,z,between(2.5,5.5),color('wood'));
+      }
       // Curved, faceted volume inspired by the photographed wood, not a scan.
       b.curve('wood',[[-2.2,0,-12],[-2.5,1.5,-12],[-2.35,3.5,-12],[-1.9,5.2,-12],[-.7,6.6,-12],[.7,6.8,-12],[2,6,-12],[2.6,4.7,-12],[2.4,3,-12],[1.9,2,-12]],[.38,.40,.42,.50,.60,.65,.62,.55,.45,.42],[.67,.43,.28]);
       b.curve('wood',[[-2.1,2.7,-12],[-3,3.5,-11.8],[-3.3,4.5,-11.9],[-3.15,5.3,-12]],[.22,.25,.21,.13],[.56,.34,.22]);
@@ -185,6 +237,8 @@
         b.curve('wood',[[x,0,z],[x+lean*.2,h*.27,z+.3],[x+lean*.6,h*.65,z+.6],[x+lean,h,z+.8]],[between(.22,.55),.5,.36,.14],color('wood'));
       }
       for(let z=-5;z>=-38;z-=8){b.curve('wood',[[-12,0,z],[-11,5,z],[-7,9,z],[0,10,z],[7,9,z],[11,5,z],[12,0,z]],[.45,.48,.52,.54,.52,.48,.45],[.58,.37,.23]);}
+      for(let i=0;i<24;i++){const side=i%2?1:-1;b.root(side*between(4,23),between(-45,16),between(2,7),color('wood'));}
+      for(let i=0;i<45;i++){const side=i%2?1:-1;b.box('wood',side*between(4,22),between(.8,8),between(-44,15),between(.08,.32),between(.16,.65),.09,color('wood'));}
       b.disk('viaggio',0,4.7,-17,3.3,[1,1,1]);b.ring('wood',0,4.7,-16.9,3.55,[.76,.58,.39],.22);
       worlds.push(b.finish());
     }
@@ -207,6 +261,16 @@
       b.ribbon('viaggio',-.1,1.1,-8.05,2.3,3.3,[.88,.71,.72],[-.6,2.4,2.3],[.27,.18,.65,.42]);
       b.ribbon('teatrino',.05,2.3,-9.7,2.9,1.2,[.78,.25,.20],[.8,-.4,-2.8],[.30,.18,.70,.35]);
       for(let i=0;i<5;i++)b.beam('viaggio',[-1.3,1.1+i*.28,-8],[1.2,1.5+i*.34,-8.05],.04,[.85,.75,.73],[-.6,2.4,2.3]);
+      for(let i=0;i<24;i++){
+        const side=i%2?1:-1,x=side*between(4,21),z=between(-43,13);
+        b.ribbon('viaggio',x,between(1.2,4.5),z,between(.4,1.4),between(1.2,3.5),color('cloth'),null,crop());
+        if(i%3===0)b.root(x,z,between(2,5),color('wood'));
+      }
+      // Flecks are part of the same compact/dispersed motion as the larger found materials.
+      for(let i=0;i<38;i++){
+        const x=between(-1.7,1.7),y=between(1,5),z=between(-10,-7.5),off=[x*between(.5,1.6),between(-1,2),between(-2,2)];
+        b.box(i%2?'fabbriche':'viaggio',x,y,z,between(.08,.3),between(.1,.4),between(.04,.12),i%2?color('metal'):color('cloth'),null,off);
+      }
       worlds.push(b.finish());
     }
     const skyData=[],lon=48,lat=24,radius=90;
@@ -283,12 +347,14 @@
         yaw+=((keys.has('l')?1:0)-(keys.has('j')?1:0))*dt;pitch=Math.max(-1.3,Math.min(1.3,pitch+((keys.has('i')?1:0)-(keys.has('k')?1:0))*dt));
       }
       scatter=reduced.matches?targetScatter:scatter+(targetScatter-scatter)*Math.min(1,dt*2.2);
-      const ratio=Math.min(devicePixelRatio||1,1.25),w=Math.max(1,Math.round(canvas.clientWidth*ratio)),h=Math.max(1,Math.round(canvas.clientHeight*ratio));if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
+      const ratio=Math.min(devicePixelRatio||1,1.65),w=Math.max(1,Math.round(canvas.clientWidth*ratio)),h=Math.max(1,Math.round(canvas.clientHeight*ratio));if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
       gl.viewport(0,0,w,h);gl.clearColor(...stages[stage].fog,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
       const vp=mult(perspective(Math.PI/3,w/h,.08,220),view(pos,yaw,pitch));
       gl.disable(gl.DEPTH_TEST);gl.depthMask(false);gl.useProgram(skyProgram);gl.bindBuffer(gl.ARRAY_BUFFER,skyBuffer);attrib(skyProgram,'aPos',3,20,0);attrib(skyProgram,'aUV',2,20,12);
-      gl.uniformMatrix4fv(gl.getUniformLocation(skyProgram,'uVP'),false,vp);gl.uniform3fv(gl.getUniformLocation(skyProgram,'uCamera'),pos);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,skyTextures[stage]);gl.uniform1i(gl.getUniformLocation(skyProgram,'uImage'),0);gl.drawArrays(gl.TRIANGLES,0,skyData.length/5);
+      gl.uniformMatrix4fv(gl.getUniformLocation(skyProgram,'uVP'),false,vp);gl.uniform3fv(gl.getUniformLocation(skyProgram,'uCamera'),pos);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,skyTextures[stage]);gl.uniform1i(gl.getUniformLocation(skyProgram,'uImage'),0);
+      gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,detailTextures[stage]);gl.uniform1i(gl.getUniformLocation(skyProgram,'uDetail'),1);gl.drawArrays(gl.TRIANGLES,0,skyData.length/5);
       gl.enable(gl.DEPTH_TEST);gl.depthMask(true);gl.useProgram(sceneProgram);gl.uniformMatrix4fv(gl.getUniformLocation(sceneProgram,'uVP'),false,vp);gl.uniform3fv(gl.getUniformLocation(sceneProgram,'uCamera'),pos);gl.uniform3fv(gl.getUniformLocation(sceneProgram,'uFog'),stages[stage].fog);gl.uniform1f(gl.getUniformLocation(sceneProgram,'uScatter'),scatter);
+      gl.uniform1i(gl.getUniformLocation(sceneProgram,'uDetail'),1);gl.activeTexture(gl.TEXTURE0);
       for(const mesh of worlds[stage]){
         gl.bindBuffer(gl.ARRAY_BUFFER,mesh.buffer);attrib(sceneProgram,'aPos',3,56,0);attrib(sceneProgram,'aNormal',3,56,12);attrib(sceneProgram,'aUV',2,56,24);attrib(sceneProgram,'aColor',3,56,32);attrib(sceneProgram,'aOffset',3,56,44);
         gl.bindTexture(gl.TEXTURE_2D,mesh.texture);gl.uniform1i(gl.getUniformLocation(sceneProgram,'uImage'),0);gl.uniform1f(gl.getUniformLocation(sceneProgram,'uMix'),mesh.group==='wood'?.68:.60);gl.drawArrays(gl.TRIANGLES,0,mesh.count);
