@@ -296,7 +296,7 @@
     }
     function goTo(next){
       if(busy||next<0||next>=stages.length)return;
-      busy=true;clearControls();
+      busy=true;clearControls();ambience?.setScene(stages[next].sound);
       const forward=next>stage&&!reduced.matches;
       if(forward){
         const targets=[[0,3.7,-14],[0,2.4,-11],[0,3.4,-16]];

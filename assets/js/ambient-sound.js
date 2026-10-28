@@ -1,13 +1,13 @@
-/* A quiet, locally synthesised soundscape. No recordings or services are required. */
+/* Background music is played from local, attributed CC BY recordings. */
 (() => {
   'use strict';
-  const profiles={
-    prima:{notes:[196.00,293.66,392.00],filter:720,rate:.027},
-    teatrino:{notes:[174.61,261.63,349.23],filter:640,rate:.031},
-    deserto:{notes:[146.83,220.00,293.66],filter:560,rate:.038},
-    fabbriche:{notes:[130.81,196.00,261.63],filter:600,rate:.034},
-    wood:{notes:[123.47,185.00,246.94],filter:480,rate:.025},
-    viaggio:{notes:[164.81,246.94,329.63],filter:760,rate:.029}
+  const tracks={
+    prima:{file:'meditation-impromptu-01.mp3',title:'Meditation Impromptu 01',isrc:'USUAN1100163',level:1.8},
+    teatrino:{file:'meditation-impromptu-02.mp3',title:'Meditation Impromptu 02',isrc:'USUAN1100162',level:1.8},
+    deserto:{file:'healing.mp3',title:'Healing',isrc:'USUAN1200048',level:.95},
+    fabbriche:{file:'morning.mp3',title:'Morning',isrc:'USUAN2300003',level:.95},
+    wood:{file:'that-zen-moment.mp3',title:'That Zen Moment',isrc:'USUAN2400001',level:.95},
+    viaggio:{file:'meditation-impromptu-03.mp3',title:'Meditation Impromptu 03',isrc:'USUAN1100161',level:1.8}
   };
   const preferenceKey='montico-ambient-muted';
   function create(button,italian){
@@ -15,12 +15,19 @@
     if(!button||!AudioConstructor)return null;
     let muted=false;
     try{muted=localStorage.getItem(preferenceKey)==='1';}catch(error){/* Optional preference storage. */}
-    let context=null,master=null,current=null,requested=null,suspendTimer=null;
+    let context=null,master=null,slots=[],active=null,pending=null,requested=null,started=false,serial=0,suspendTimer=null;
     function updateButton(){
       button.hidden=false;button.textContent=muted?'♪ off':'♪ on';
       button.setAttribute('aria-pressed',String(!muted));
       button.setAttribute('aria-label',italian?'Suono ambientale':'Ambient sound');
       button.title=italian?'Suono ambientale':'Ambient sound';
+    }
+    function updateCredit(){
+      const credit=document.getElementById('musicCredit'),link=document.getElementById('musicTrack');
+      if(!credit||!link||!tracks[requested])return;
+      link.textContent=tracks[requested].title;
+      link.href='https://incompetech.com/music/royalty-free/index.html?isrc='+tracks[requested].isrc;
+      credit.hidden=false;
     }
     function fade(param,value,seconds){
       const now=context.currentTime;
@@ -31,50 +38,78 @@
     function ensureContext(){
       if(context)return;
       context=new AudioConstructor();master=context.createGain();master.gain.value=0;master.connect(context.destination);
-    }
-    function buildPad(key){
-      const profile=profiles[key],bus=context.createGain(),filter=context.createBiquadFilter(),nodes=[],oscillators=[];
-      bus.gain.value=0;bus.connect(master);filter.type='lowpass';filter.frequency.value=profile.filter;filter.Q.value=.25;filter.connect(bus);
-      profile.notes.forEach((frequency,index)=>{
-        const tone=context.createOscillator(),volume=context.createGain(),lfo=context.createOscillator(),depth=context.createGain();
-        tone.type=index===0?'triangle':'sine';tone.frequency.value=frequency;
-        volume.gain.value=[.23,.14,.10][index];lfo.type='sine';lfo.frequency.value=profile.rate+index*.008;depth.gain.value=[.045,.03,.022][index];
-        tone.connect(volume);volume.connect(filter);lfo.connect(depth);depth.connect(volume.gain);
-        tone.start();lfo.start();nodes.push(tone,volume,lfo,depth);oscillators.push(tone,lfo);
-      });
-      nodes.push(filter,bus);
-      return {key,bus,nodes,oscillators};
-    }
-    function changePad(){
-      if(!context||muted||!requested||current?.key===requested)return;
-      const next=buildPad(requested),old=current;current=next;fade(next.bus.gain,1,2.8);
-      if(old){
-        fade(old.bus.gain,0,2.8);
-        old.oscillators[0].onended=()=>old.nodes.forEach(node=>node.disconnect());
-        old.oscillators.forEach(oscillator=>oscillator.stop(context.currentTime+3));
+      for(let i=0;i<2;i++){
+        const audio=document.createElement('audio'),gain=context.createGain();
+        audio.preload='none';audio.loop=true;audio.playsInline=true;audio.hidden=true;audio.setAttribute('playsinline','');document.body.appendChild(audio);
+        gain.gain.value=0;context.createMediaElementSource(audio).connect(gain);gain.connect(master);
+        slots.push({audio,gain,key:null,token:0});
       }
     }
-    function setScene(key){if(profiles[key]){requested=key;changePad();}}
+    function silence(){
+      serial++;pending=null;
+      if(!context||!master)return;
+      fade(master.gain,0,.4);clearTimeout(suspendTimer);
+      suspendTimer=setTimeout(()=>{
+        if(muted){slots.forEach(slot=>slot.audio.pause());if(context.state==='running')context.suspend().catch(()=>{});}
+      },500);
+    }
+    function failed(operation){
+      if(operation!==serial)return;
+      muted=true;silence();updateButton();
+    }
+    function resumeContext(){
+      if(context.state==='running')return;
+      context.resume().catch(()=>{
+        if(!document.hidden&&!muted&&context.state!=='running'){muted=true;silence();updateButton();}
+      });
+    }
+    function changeTrack(key){
+      if(!context||muted||!started||!tracks[key]||pending?.key===key||(!pending&&active?.key===key))return;
+      const operation=++serial,slot=slots.find(candidate=>candidate!==active)||slots[0],track=tracks[key];
+      slot.audio.pause();slot.gain.gain.cancelScheduledValues(context.currentTime);slot.gain.gain.setValueAtTime(0,context.currentTime);
+      slot.key=key;slot.token=operation;slot.audio.src='../assets/audio/'+track.file;
+      pending={key,operation};
+      let playback;
+      try{playback=slot.audio.play();}catch(error){failed(operation);return;}
+      Promise.resolve(playback).then(()=>{
+        if(operation!==serial||muted||requested!==key||document.hidden){if(slot.token===operation)slot.audio.pause();return;}
+        const old=active;active=slot;pending=null;fade(slot.gain.gain,track.level,2.5);
+        if(old&&old!==slot){
+          const oldToken=old.token;fade(old.gain.gain,0,2.5);
+          setTimeout(()=>{if(active!==old&&old.token===oldToken)old.audio.pause();},2700);
+        }
+      }).catch(()=>failed(operation));
+    }
+    function setScene(key){
+      if(!tracks[key])return;
+      requested=key;updateCredit();
+      if(context&&!muted&&started){
+        resumeContext();changeTrack(key);
+      }
+    }
     function start(key){
-      setScene(key);if(muted||!requested)return;
+      if(tracks[key]){requested=key;updateCredit();}
+      if(muted||!requested)return;
       try{
-        ensureContext();changePad();clearTimeout(suspendTimer);
-        if(context.state!=='running')context.resume().catch(()=>{muted=true;updateButton();});
-        fade(master.gain,.16,2.5);
-      }catch(error){muted=true;updateButton();}
+        ensureContext();started=true;clearTimeout(suspendTimer);
+        resumeContext();
+        fade(master.gain,.35,1.5);
+        if(active?.key===requested&&!pending){
+          const operation=serial;Promise.resolve(active.audio.play()).catch(()=>failed(operation));
+        }else changeTrack(requested);
+      }catch(error){muted=true;silence();updateButton();}
     }
     button.addEventListener('click',()=>{
       muted=!muted;try{localStorage.setItem(preferenceKey,muted?'1':'0');}catch(error){/* Sound still works without storage. */}
       updateButton();
-      if(muted&&context){
-        fade(master.gain,0,.45);clearTimeout(suspendTimer);
-        suspendTimer=setTimeout(()=>{if(muted&&context.state==='running')context.suspend().catch(()=>{});},600);
-      }else if(!muted)start(requested);
+      if(muted)silence();else start(requested);
     });
     document.addEventListener('visibilitychange',()=>{
-      if(!context)return;
-      if(document.hidden&&context.state==='running')context.suspend().catch(()=>{});
-      else if(!document.hidden&&!muted&&context.state!=='running'&&context.state!=='closed')context.resume().catch(()=>{});
+      if(!context||!started)return;
+      if(document.hidden){
+        serial++;pending=null;slots.forEach(slot=>slot.audio.pause());
+        if(context.state==='running')context.suspend().then(()=>{if(!document.hidden&&!muted)start(requested);}).catch(()=>{});
+      }else if(!muted)start(requested);
     });
     updateButton();
     return {start,setScene};

@@ -55,7 +55,7 @@
   byId('workTitle').textContent = work.title;
   byId('welcomeTitle').textContent = work.title;
   byId('description').textContent = italian ? work.textIt : work.textEn;
-  byId('language').href += '?work=' + encodeURIComponent(key) + '&v=audio-20261028b';
+  byId('language').href += '?work=' + encodeURIComponent(key) + '&v=music-20261028';
   const imagePath = '../assets/images/' + work.image;
   byId('welcomeImage').src = imagePath;
   byId('welcomeImage').alt = work.title;
