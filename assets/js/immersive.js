@@ -55,7 +55,7 @@
   byId('workTitle').textContent = work.title;
   byId('welcomeTitle').textContent = work.title;
   byId('description').textContent = italian ? work.textIt : work.textEn;
-  byId('language').href += '?work=' + encodeURIComponent(key);
+  byId('language').href += '?work=' + encodeURIComponent(key) + '&v=audio-20261028b';
   const imagePath = '../assets/images/' + work.image;
   byId('welcomeImage').src = imagePath;
   byId('welcomeImage').alt = work.title;
@@ -308,6 +308,7 @@
     let pos=[0,1.75,15],yaw=0,pitch=.04,last=0,live=false,lookPointer=null,lastX=0,lastY=0;
     const keys=new Set(), touch=new Set();
     const welcome=byId('welcome'),help=byId('help'),original=byId('original');
+    const ambience=window.MonticoAmbient?.create(byId('soundBtn'),italian);
     const modalOpen=()=>!welcome.hidden||!help.hidden||!original.hidden;
     function clearControls(){keys.clear();touch.clear();document.querySelectorAll('.touch-controls button').forEach(b=>b.classList.remove('pressed'));}
     function reset(){pos=[0,1.75,15];yaw=0;pitch=.04;clearControls();}
@@ -315,7 +316,7 @@
     function closeDialog(dialog){dialog.hidden=true;(dialog===help?byId('helpBtn'):byId('originalBtn')).focus({preventScroll:true});}
     const enter=byId('enter'); enter.disabled=false; enter.textContent=italian?'Entra nello spazio':'Enter the space';
     enter.focus({preventScroll:true});
-    enter.addEventListener('click',()=>{welcome.hidden=true;live=true;canvas.focus({preventScroll:true});setTimeout(()=>byId('hint').classList.add('fade'),9000);});
+    enter.addEventListener('click',()=>{welcome.hidden=true;live=true;ambience?.start(key);canvas.focus({preventScroll:true});setTimeout(()=>byId('hint').classList.add('fade'),9000);});
     byId('helpBtn').addEventListener('click',()=>openDialog(help));
     byId('originalBtn').addEventListener('click',()=>openDialog(original));
     byId('resetBtn').addEventListener('click',()=>{reset();help.hidden=true;canvas.focus({preventScroll:true});});

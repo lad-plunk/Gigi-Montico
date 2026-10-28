@@ -14,10 +14,10 @@
     '../assets/images/hi-viaggio-diametro.jpg'
   ];
   const stages = [
-    {title:'Fabbriche', text:'Un quadro ne custodisce un altro. Il rosso diventa una soglia.', action:'Entra nel quadro \u2192', fog:[.26,.36,.31]},
-    {title:"Teatrino dell'infinito", text:'Tra le quinte appare una forma immaginata dai legni di Montico.', action:'Entra nella scultura \u2192', fog:[.20,.29,.27]},
-    {title:'Dentro il legno', text:'Le tracce nel legno diventano corridoi. Al loro interno, un altro quadro.', action:'Entra nel quadro \u2192', fog:[.38,.29,.25]},
-    {title:'La materia di Viaggio', text:'Legno, tessuto e frammenti di circuito si incontrano e si trasformano.', action:'', fog:[.27,.28,.36]}
+    {title:'Fabbriche', text:'Un quadro ne custodisce un altro. Il rosso diventa una soglia.', action:'Entra nel quadro \u2192', sound:'fabbriche', fog:[.26,.36,.31]},
+    {title:"Teatrino dell'infinito", text:'Tra le quinte appare una forma immaginata dai legni di Montico.', action:'Entra nella scultura \u2192', sound:'teatrino', fog:[.20,.29,.27]},
+    {title:'Dentro il legno', text:'Le tracce nel legno diventano corridoi. Al loro interno, un altro quadro.', action:'Entra nel quadro \u2192', sound:'wood', fog:[.38,.29,.25]},
+    {title:'La materia di Viaggio', text:'Legno, tessuto e frammenti di circuito si incontrano e si trasformano.', action:'', sound:'viaggio', fog:[.27,.28,.36]}
   ];
   function loadImage(src) { return new Promise((resolve,reject) => {const image=new Image(); image.onload=()=>resolve(image); image.onerror=reject; image.src=src;}); }
   Promise.all(sources.map(loadImage)).then(images => {
@@ -212,7 +212,7 @@
         if(i%2===0)b.ribbon('fabbriche',x,between(2.2,4.5),z,between(.5,1.5),between(1.2,3),color('green'),null,crop());
       }
       for(let i=0;i<45;i++){const side=i%2?1:-1;b.box('fabbriche',side*between(4,22),between(.6,8),between(-43,17),between(.10,.4),between(.15,.55),.08,color('green'));}
-      b.painting('teatrino',0,1.5,-15,9,6.8,[.35,.23,.17]);
+      b.painting('teatrino',0,1.5,-15,5.8,4.4,[.35,.23,.17]);
       worlds.push(b.finish());
     }
     {
@@ -224,10 +224,11 @@
         b.ribbon('teatrino',x,between(2.4,5),z,between(.6,1.8),between(1.5,4),color('cloth'),null,crop());
         if(i%2===0)b.root(x,z,between(2.5,5.5),color('wood'));
       }
-      // Curved, faceted volume inspired by the photographed wood, not a scan.
-      b.curve('wood',[[-2.2,0,-12],[-2.5,1.5,-12],[-2.35,3.5,-12],[-1.9,5.2,-12],[-.7,6.6,-12],[.7,6.8,-12],[2,6,-12],[2.6,4.7,-12],[2.4,3,-12],[1.9,2,-12]],[.38,.40,.42,.50,.60,.65,.62,.55,.45,.42],[.67,.43,.28]);
-      b.curve('wood',[[-2.1,2.7,-12],[-3,3.5,-11.8],[-3.3,4.5,-11.9],[-3.15,5.3,-12]],[.22,.25,.21,.13],[.56,.34,.22]);
-      b.curve('wood',[[1.7,5.5,-12],[2.5,6.2,-12.2],[2.9,7.0,-12.4],[3,7.6,-12.5]],[.24,.22,.18,.10],[.58,.36,.24]);
+      // Keep the next sculpture modest in scale so it reads as a passage.
+      const gateway=(points,radii,col)=>b.curve('wood',points.map(p=>[p[0]*.60,p[1]*.60,p[2]]),radii.map(r=>r*.60),col);
+      gateway([[-2.2,0,-12],[-2.5,1.5,-12],[-2.35,3.5,-12],[-1.9,5.2,-12],[-.7,6.6,-12],[.7,6.8,-12],[2,6,-12],[2.6,4.7,-12],[2.4,3,-12],[1.9,2,-12]],[.38,.40,.42,.50,.60,.65,.62,.55,.45,.42],[.67,.43,.28]);
+      gateway([[-2.1,2.7,-12],[-3,3.5,-11.8],[-3.3,4.5,-11.9],[-3.15,5.3,-12]],[.22,.25,.21,.13],[.56,.34,.22]);
+      gateway([[1.7,5.5,-12],[2.5,6.2,-12.2],[2.9,7.0,-12.4],[3,7.6,-12.5]],[.24,.22,.18,.10],[.58,.36,.24]);
       worlds.push(b.finish());
     }
     {
@@ -239,7 +240,7 @@
       for(let z=-5;z>=-38;z-=8){b.curve('wood',[[-12,0,z],[-11,5,z],[-7,9,z],[0,10,z],[7,9,z],[11,5,z],[12,0,z]],[.45,.48,.52,.54,.52,.48,.45],[.58,.37,.23]);}
       for(let i=0;i<24;i++){const side=i%2?1:-1;b.root(side*between(4,23),between(-45,16),between(2,7),color('wood'));}
       for(let i=0;i<45;i++){const side=i%2?1:-1;b.box('wood',side*between(4,22),between(.8,8),between(-44,15),between(.08,.32),between(.16,.65),.09,color('wood'));}
-      b.disk('viaggio',0,4.7,-17,3.3,[1,1,1]);b.ring('wood',0,4.7,-16.9,3.55,[.76,.58,.39],.22);
+      b.disk('viaggio',0,3.4,-17,2.1,[1,1,1]);b.ring('wood',0,3.4,-16.9,2.3,[.76,.58,.39],.16);
       worlds.push(b.finish());
     }
     {
@@ -283,11 +284,12 @@
     function view(pos,yaw,pitch){const sy=Math.sin(yaw),cy=Math.cos(yaw),sp=Math.sin(pitch),cp=Math.cos(pitch),fx=sy*cp,fy=sp,fz=-cy*cp,sx=cy,sz=sy,ux=-sy*sp,uy=cp,uz=cy*sp;return new Float32Array([sx,ux,-fx,0,0,uy,-fy,0,sz,uz,-fz,0,-(sx*pos[0]+sz*pos[2]),-(ux*pos[0]+uy*pos[1]+uz*pos[2]),fx*pos[0]+fy*pos[1]+fz*pos[2],1]);}
     let stage=0,pos=[0,2,15],yaw=0,pitch=.035,scatter=0,targetScatter=0,last=0,active=false,busy=false,travel=null,lookPointer=null,lastX=0,lastY=0;
     const keys=new Set(),touch=new Set(),welcome=$('welcome'),help=$('help'),reduced=matchMedia('(prefers-reduced-motion: reduce)');
+    const ambience=window.MonticoAmbient?.create($('soundBtn'),true);
     const modalOpen=()=>!welcome.hidden||!help.hidden;
     function clearControls(){keys.clear();touch.clear();document.querySelectorAll('.nest-touch button').forEach(b=>b.classList.remove('pressed'));}
     function resetView(){pos=stage===3?[0,2.2,canvas.clientWidth/canvas.clientHeight<.75?5.5:2]:[0,2,15];yaw=0;pitch=.035;clearControls();}
     function updateStage(){
-      const s=stages[stage];$('stageNumber').textContent=String(stage+1).padStart(2,'0')+' / 04';$('stageTitle').textContent=s.title;$('stageText').textContent=s.text;
+      const s=stages[stage];$('stageNumber').textContent=String(stage+1).padStart(2,'0')+' / 04';$('stageTitle').textContent=s.title;$('stageText').textContent=s.text;ambience?.setScene(s.sound);
       $('previous').hidden=stage===0;$('next').hidden=stage===3;$('next').textContent=s.action;
       $('scatter').hidden=stage!==3;$('gather').hidden=stage!==3;
       $('scatter').setAttribute('aria-pressed',String(targetScatter===1));$('gather').setAttribute('aria-pressed',String(targetScatter===0));
@@ -297,14 +299,14 @@
       busy=true;clearControls();
       const forward=next>stage&&!reduced.matches;
       if(forward){
-        const targets=[[0,4.7,-14],[0,4.2,-11],[0,4.7,-16]];
+        const targets=[[0,3.7,-14],[0,2.4,-11],[0,3.4,-16]];
         travel={start:performance.now(),from:[...pos],to:targets[stage],yaw,pitch};
         window.setTimeout(()=>$('transition').classList.add('active'),700);
       }else $('transition').classList.add('active');
       window.setTimeout(()=>{stage=next;scatter=0;targetScatter=0;travel=null;resetView();updateStage();$('transition').classList.remove('active');busy=false;},reduced.matches?0:(forward?1180:480));
     }
     $('start').disabled=false;$('start').textContent='Inizia il viaggio';$('start').focus({preventScroll:true});
-    $('start').addEventListener('click',()=>{welcome.hidden=true;active=true;canvas.focus({preventScroll:true});});
+    $('start').addEventListener('click',()=>{welcome.hidden=true;active=true;ambience?.start(stages[stage].sound);canvas.focus({preventScroll:true});});
     $('next').addEventListener('click',()=>goTo(stage+1));$('previous').addEventListener('click',()=>goTo(stage-1));
     $('scatter').addEventListener('click',()=>{targetScatter=1;updateStage();});$('gather').addEventListener('click',()=>{targetScatter=0;updateStage();});
     $('helpBtn').addEventListener('click',()=>{clearControls();help.hidden=false;$('closeHelp').focus({preventScroll:true});});
