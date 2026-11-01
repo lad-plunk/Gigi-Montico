@@ -1,0 +1,6 @@
+.meta-feature{background:#292b30;color:#f9f3ea}
+.meta-feature .world-feature-art{background:linear-gradient(145deg,#14232c44,#49302b99),url('../images/hi-paure-inventate.jpg') center/cover}
+.meta-feature .world-feature-art::after{left:18%;right:auto;bottom:9%;width:43%;height:auto;aspect-ratio:1;border:1px solid #ecd9baaa;border-radius:50%;background:radial-gradient(circle at 30% 24%,#dac3a155,#5f493b44 55%,#191b2488);box-shadow:0 18px 40px #12171966;transform:none}
+.meta-feature .world-feature-copy .eyebrow{color:#d7bd9b}.meta-feature .world-feature-copy p{color:#e3dcd3}.meta-feature .world-feature-copy a{background:#dfc6a7;color:#282529}
+.meta-wood{display:block;margin:.85rem 0 .6rem;padding:.8rem 1rem;border:1px solid #967558;border-radius:5px;background:#f3e7d8;color:#32271f;font:700 .9rem Arial,sans-serif;cursor:pointer}
+.meta-wood:focus-visible,.meta-feature a:focus-visible{outline:3px solid #d48c59;outline-offset:3px}
