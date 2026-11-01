@@ -1,0 +1,8 @@
+.world-feature{display:grid;grid-template-columns:1fr 1fr;margin:2.5rem 0 0;background:#1d3733;color:#fff8ef;overflow:hidden}
+.world-feature-art{min-height:300px;position:relative;background:linear-gradient(180deg,#37637e55,#102c2db3),url('../images/hi-fabbriche.jpg') center/cover}
+.world-feature-art::after{content:"";position:absolute;left:13%;right:13%;bottom:13%;height:35%;border-radius:50%;border:1px solid #e5d9b6aa;box-shadow:0 0 60px #b7d7bd55,inset 0 0 45px #ebd8ad33;transform:rotate(-8deg)}
+.world-feature-copy{padding:clamp(2rem,4vw,3.5rem);align-self:center}.world-feature-copy .eyebrow{color:#e5c6a8}
+.world-feature-copy h2{font:400 clamp(2.1rem,4vw,3.5rem)/1 Georgia,serif;letter-spacing:-.035em;margin:.7rem 0 1rem}
+.world-feature-copy p{color:#d9e5dc;font:1rem/1.6 Arial,sans-serif;max-width:34rem}.world-feature-copy a{display:inline-flex;margin-top:.5rem;padding:.85rem 1rem;border-radius:5px;background:#eac7ad;color:#183029;text-decoration:none;font:700 .85rem Arial,sans-serif}
+.world-view .lab-panel{max-width:310px}.world-view .lab-panel p{max-width:290px}
+@media(max-width:650px){.world-feature{grid-template-columns:1fr}.world-feature-art{min-height:210px}.world-feature-copy{padding:1.6rem}}
