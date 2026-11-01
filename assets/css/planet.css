@@ -1,0 +1,18 @@
+.planet-feature { display:grid; grid-template-columns:1.05fr 1fr; overflow:hidden; margin:2.5rem 0 0; background:#1d2d34; color:#fbf4e9; }
+.planet-feature-art { min-height:270px; position:relative; overflow:hidden; background:#27353e; }
+.planet-feature-art::before { content:""; position:absolute; width:65%; aspect-ratio:1; left:17%; top:50%; transform:translateY(-50%); border-radius:50%; background:linear-gradient(125deg,#ffffff1c,#090f1a77),url('../images/front-page-image.jpg') center/cover; box-shadow:inset -20px -18px 45px #10141eaa,0 0 0 1px #ffffff45,0 0 70px #6c9ba242; }
+.planet-feature-art::after { content:""; position:absolute; width:83%; height:36%; left:8%; top:32%; border:1px solid #e8d1b980; border-radius:50%; transform:rotate(-17deg); }
+.planet-feature-copy { padding:clamp(2rem,4vw,3.5rem); align-self:center; }
+.planet-feature-copy .eyebrow { color:#e5bd9f; }
+.planet-feature-copy h2 { font:400 clamp(2rem,4vw,3.4rem)/1 Georgia,serif; letter-spacing:-.035em; margin:.7rem 0 1rem; }
+.planet-feature-copy p { color:#d5dddb; font:1rem/1.6 Arial,sans-serif; max-width:32rem; }
+.planet-feature-copy a { display:inline-flex; padding:.85rem 1rem; margin-top:.5rem; color:#19272c; background:#ecc8af; border-radius:5px; text-decoration:none; font:700 .85rem Arial,sans-serif; }
+.planet-view .planet-region { position:fixed; z-index:2; top:84px; left:max(.9rem,env(safe-area-inset-left)); max-width:min(360px,75vw); background:#142329c9; border-left:2px solid #f2c7a0; padding:.55rem .75rem; color:#f8eee3; font:.76rem/1.35 Arial,sans-serif; pointer-events:none; }
+.planet-view .planet-region span { display:block; color:#dfc2ad; font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.2rem; }
+.planet-view .work-pair { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem; }
+.planet-view .work-pair figure { margin:0; min-width:0; }
+.planet-view .work-pair img { display:block; width:100%; height:200px; object-fit:contain; background:#0d1c20; }
+.planet-view .work-pair figcaption { margin-top:.45rem; color:#e9e1d9; font:.76rem/1.4 Arial,sans-serif; }
+.planet-view .viewer-error { overflow:auto; }
+@media(max-width:650px) { .planet-feature { grid-template-columns:1fr; } .planet-feature-art { min-height:210px; } .planet-feature-copy { padding:1.6rem; } }
+@media(max-width:430px) { .planet-view .planet-region { top:117px; } .planet-view .work-pair img { height:140px; } }
